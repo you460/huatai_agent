@@ -1,0 +1,8 @@
+# 数据库驱动
+psycopg2-binary==2.9.9
+# 大模型 SDK（OpenAI 协议，兼容 DeepSeek）
+openai==3.3.0
+# SQL 语法解析（安全围栏用）
+sqlglot==30.17.0
+# Web 界面
+gradio==6.26.0

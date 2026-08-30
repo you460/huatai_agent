@@ -1,0 +1,905 @@
+{
+  "version": "1.0",
+  "update_date": "2026-08-19",
+  "global_rules": {
+    "date_format": "所有日期字段均为字符串类型，格式为yyyymmdd，例如'20260331'，不是日期类型，比较时直接用字符串比较",
+    "default_cust_date": "客户信息表ads_cust_info_d默认查询最新分区data_dt='20260531'",
+    "default_biz_date": "资产、持仓、交易类表默认常用截止日期为'20260331'，Q1范围为'20260101'至'20260331'",
+    "dictionary_rule": "所有代码类字段如需展示中文，必须关联dim_public字典表：表.代码字段 = dim_public.code 且 dim_public.code_type_id = '对应类型ID'",
+    "sql_limit": "仅允许执行SELECT查询，禁止DROP、DELETE、UPDATE等修改数据的操作",
+    "null_handle": "数值字段为空时用coalesce(字段名, 0)处理为0"
+  },
+  "dictionary_types": [
+    {
+      "code_type_id": "100",
+      "type_name": "客户等级"
+    },
+    {
+      "code_type_id": "200",
+      "type_name": "账户状态"
+    },
+    {
+      "code_type_id": "300",
+      "type_name": "证件类型"
+    },
+    {
+      "code_type_id": "400",
+      "type_name": "风险等级"
+    },
+    {
+      "code_type_id": "500",
+      "type_name": "性别"
+    },
+    {
+      "code_type_id": "600",
+      "type_name": "学历"
+    },
+    {
+      "code_type_id": "700",
+      "type_name": "职业类型"
+    }
+  ],
+  "tables": [
+    {
+      "table_name": "ads_cust_info_d",
+      "table_cn_name": "客户信息表",
+      "table_description": "客户基本属性快照表，粒度为客户+日期，存储客户的人口属性、账户属性、所属营业部等信息",
+      "table_alias": "cust",
+      "primary_key": [
+        "pty_id",
+        "data_dt"
+      ],
+      "partition_key": "data_dt",
+      "columns": [
+        {
+          "column_name": "data_dt",
+          "column_cn_name": "数据日期",
+          "column_type": "varchar(8)",
+          "column_description": "快照日期，格式yyyymmdd",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "pty_id",
+          "column_cn_name": "客户号",
+          "column_type": "varchar(32)",
+          "column_description": "客户唯一标识，全库通用关联键",
+          "is_join_key": true,
+          "related_table": "所有业务表",
+          "is_enum": false
+        },
+        {
+          "column_name": "sor_pty_id",
+          "column_cn_name": "经纪客户号",
+          "column_type": "varchar(32)",
+          "column_description": "经纪业务系统的客户编号",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "cust_lvl_cd",
+          "column_cn_name": "客户等级代码",
+          "column_type": "varchar(12)",
+          "column_description": "客户等级编码，需关联字典表转中文",
+          "is_join_key": false,
+          "is_enum": true,
+          "enum_source": "dim_public",
+          "enum_type_id": "100"
+        },
+        {
+          "column_name": "cust_status",
+          "column_cn_name": "账户状态",
+          "column_type": "varchar(12)",
+          "column_description": "客户账户的状态编码",
+          "is_join_key": false,
+          "is_enum": true,
+          "enum_source": "dim_public",
+          "enum_type_id": "200"
+        },
+        {
+          "column_name": "cust_type",
+          "column_cn_name": "客户类型",
+          "column_type": "varchar(1)",
+          "column_description": "客户类型编码",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "prov_name",
+          "column_cn_name": "省份",
+          "column_type": "varchar(50)",
+          "column_description": "客户所在省份，直接是中文",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "city_name",
+          "column_cn_name": "城市",
+          "column_type": "varchar(50)",
+          "column_description": "客户所在城市，直接是中文",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "birth_dt",
+          "column_cn_name": "出生日期",
+          "column_type": "varchar(8)",
+          "column_description": "客户出生日期，格式yyyymmdd",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "cust_age",
+          "column_cn_name": "年龄",
+          "column_type": "numeric(20,0)",
+          "column_description": "客户周岁年龄",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "name",
+          "column_cn_name": "姓名",
+          "column_type": "varchar(40)",
+          "column_description": "客户姓名",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "gender_cd",
+          "column_cn_name": "性别代码",
+          "column_type": "varchar(12)",
+          "column_description": "性别编码，需关联字典表转中文",
+          "is_join_key": false,
+          "is_enum": true,
+          "enum_source": "dim_public",
+          "enum_type_id": "500"
+        },
+        {
+          "column_name": "edu_cd",
+          "column_cn_name": "学历代码",
+          "column_type": "varchar(32)",
+          "column_description": "学历编码，需关联字典表转中文",
+          "is_join_key": false,
+          "is_enum": true,
+          "enum_source": "dim_public",
+          "enum_type_id": "600"
+        },
+        {
+          "column_name": "prof_cd",
+          "column_cn_name": "职业类型编码",
+          "column_type": "varchar(100)",
+          "column_description": "职业编码，需关联字典表转中文",
+          "is_join_key": false,
+          "is_enum": true,
+          "enum_source": "dim_public",
+          "enum_type_id": "700"
+        },
+        {
+          "column_name": "org_id",
+          "column_cn_name": "所属营业部ID",
+          "column_type": "varchar(100)",
+          "column_description": "客户所属营业部标识，关联dim_branch表",
+          "is_join_key": true,
+          "related_table": "dim_branch",
+          "is_enum": false
+        }
+      ]
+    },
+    {
+      "table_name": "dws_cust_aset_d",
+      "table_cn_name": "客户资产日汇总表",
+      "table_description": "按日汇总的客户资产数据，粒度为客户+日期，分别统计普通账户和信用账户的资产情况",
+      "table_alias": "aset",
+      "primary_key": [
+        "pty_id",
+        "data_dt"
+      ],
+      "partition_key": "data_dt",
+      "columns": [
+        {
+          "column_name": "data_dt",
+          "column_cn_name": "数据日期",
+          "column_type": "varchar(8)",
+          "column_description": "资产快照日期，格式yyyymmdd",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "pty_id",
+          "column_cn_name": "客户号",
+          "column_type": "varchar(32)",
+          "column_description": "客户唯一标识",
+          "is_join_key": true,
+          "related_table": "ads_cust_info_d",
+          "is_enum": false
+        },
+        {
+          "column_name": "nm_tot_aset",
+          "column_cn_name": "普通账户总资产",
+          "column_type": "numeric(20,4)",
+          "column_description": "普通经纪账户的总资产",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "nm_bal",
+          "column_cn_name": "普通账户现金资产",
+          "column_type": "numeric(20,4)",
+          "column_description": "普通账户的可用资金",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "fc_pur_aset",
+          "column_cn_name": "信用账户净资产",
+          "column_type": "numeric(20,4)",
+          "column_description": "信用账户的净资产（总资产减负债）",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "fc_bal",
+          "column_cn_name": "信用账户现金资产",
+          "column_type": "numeric(20,4)",
+          "column_description": "信用账户的可用资金",
+          "is_join_key": false,
+          "is_enum": false
+        }
+      ]
+    },
+    {
+      "table_name": "dws_cust_fin_d",
+      "table_cn_name": "客户资金流动日事实表",
+      "table_description": "按日统计的客户资金与证券流动数据，粒度为客户+日期+系统来源，记录各类转入转出明细",
+      "table_alias": "fin",
+      "primary_key": [
+        "data_dt",
+        "pty_id",
+        "sys_source"
+      ],
+      "partition_key": "data_dt",
+      "columns": [
+        {
+          "column_name": "data_dt",
+          "column_cn_name": "数据日期",
+          "column_type": "varchar(8)",
+          "column_description": "统计日期，格式yyyymmdd",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "pty_id",
+          "column_cn_name": "客户号",
+          "column_type": "varchar(32)",
+          "column_description": "客户唯一标识",
+          "is_join_key": true,
+          "related_table": "ads_cust_info_d",
+          "is_enum": false
+        },
+        {
+          "column_name": "sys_source",
+          "column_cn_name": "系统来源",
+          "column_type": "varchar(20)",
+          "column_description": "账户类型标识，区分普通账户和信用账户",
+          "is_join_key": false,
+          "is_enum": true,
+          "enum_source": "inline",
+          "enum_values": [
+            {
+              "value": "nm",
+              "desc": "普通账户"
+            },
+            {
+              "value": "fc",
+              "desc": "信用账户"
+            }
+          ]
+        },
+        {
+          "column_name": "cash_in",
+          "column_cn_name": "现金转入",
+          "column_type": "numeric(20,4)",
+          "column_description": "现金转入金额",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "cash_out",
+          "column_cn_name": "现金转出",
+          "column_type": "numeric(20,4)",
+          "column_description": "现金转出金额",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "tran_in",
+          "column_cn_name": "证券转入",
+          "column_type": "numeric(20,4)",
+          "column_description": "证券转入、托管转入、转托转入金额",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "tran_out",
+          "column_cn_name": "证券转出",
+          "column_type": "numeric(20,4)",
+          "column_description": "证券转出、托管转出、转托转出金额",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "assign_in",
+          "column_cn_name": "指定转入",
+          "column_type": "numeric(20,4)",
+          "column_description": "指定转入金额",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "assign_out",
+          "column_cn_name": "撤指定转出",
+          "column_type": "numeric(20,4)",
+          "column_description": "撤指定转出金额",
+          "is_join_key": false,
+          "is_enum": false
+        }
+      ]
+    },
+    {
+      "table_name": "dwd_cust_hold_d",
+      "table_cn_name": "客户持有产品日事实表",
+      "table_description": "按日统计的客户产品持仓数据，粒度为客户+日期+产品+系统来源+币种，记录持仓份额与市值",
+      "table_alias": "hold",
+      "primary_key": [
+        "data_dt",
+        "pty_id",
+        "prdt_id",
+        "sys_source",
+        "ccy"
+      ],
+      "partition_key": "data_dt",
+      "columns": [
+        {
+          "column_name": "data_dt",
+          "column_cn_name": "数据日期",
+          "column_type": "varchar(8)",
+          "column_description": "持仓快照日期，格式yyyymmdd",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "pty_id",
+          "column_cn_name": "客户号",
+          "column_type": "varchar(32)",
+          "column_description": "客户唯一标识",
+          "is_join_key": true,
+          "related_table": "ads_cust_info_d",
+          "is_enum": false
+        },
+        {
+          "column_name": "prdt_id",
+          "column_cn_name": "产品ID",
+          "column_type": "varchar(12)",
+          "column_description": "产品唯一标识",
+          "is_join_key": true,
+          "related_table": "dim_product",
+          "is_enum": false
+        },
+        {
+          "column_name": "sys_source",
+          "column_cn_name": "系统来源",
+          "column_type": "varchar(20)",
+          "column_description": "账户类型标识",
+          "is_join_key": false,
+          "is_enum": true,
+          "enum_source": "inline",
+          "enum_values": [
+            {
+              "value": "nm",
+              "desc": "普通账户"
+            },
+            {
+              "value": "fc",
+              "desc": "信用账户"
+            }
+          ]
+        },
+        {
+          "column_name": "ccy",
+          "column_cn_name": "币种",
+          "column_type": "varchar(12)",
+          "column_description": "持仓币种编码",
+          "is_join_key": false,
+          "is_enum": true,
+          "enum_source": "inline",
+          "enum_values": [
+            {
+              "value": "0",
+              "desc": "人民币"
+            },
+            {
+              "value": "1",
+              "desc": "美元"
+            },
+            {
+              "value": "2",
+              "desc": "港币"
+            }
+          ]
+        },
+        {
+          "column_name": "hold_cnt",
+          "column_cn_name": "持有份额",
+          "column_type": "numeric(20,4)",
+          "column_description": "产品持有份额数量",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "mkt_val",
+          "column_cn_name": "持有市值",
+          "column_type": "numeric(20,4)",
+          "column_description": "持仓产品的总市值",
+          "is_join_key": false,
+          "is_enum": false
+        }
+      ]
+    },
+    {
+      "table_name": "dwd_cust_tran_d",
+      "table_cn_name": "客户交易类买卖日事实表",
+      "table_description": "按日统计的客户产品交易数据，粒度为客户+日期+产品+系统来源+币种，记录买卖的数量、金额、佣金等",
+      "table_alias": "tran",
+      "primary_key": [
+        "data_dt",
+        "pty_id",
+        "prdt_id",
+        "sys_source",
+        "ccy"
+      ],
+      "partition_key": "data_dt",
+      "columns": [
+        {
+          "column_name": "data_dt",
+          "column_cn_name": "数据日期",
+          "column_type": "varchar(8)",
+          "column_description": "交易日期，格式yyyymmdd",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "pty_id",
+          "column_cn_name": "客户号",
+          "column_type": "varchar(32)",
+          "column_description": "客户唯一标识",
+          "is_join_key": true,
+          "related_table": "ads_cust_info_d",
+          "is_enum": false
+        },
+        {
+          "column_name": "prdt_id",
+          "column_cn_name": "产品ID",
+          "column_type": "varchar(12)",
+          "column_description": "产品唯一标识",
+          "is_join_key": true,
+          "related_table": "dim_product",
+          "is_enum": false
+        },
+        {
+          "column_name": "sys_source",
+          "column_cn_name": "系统来源",
+          "column_type": "varchar(20)",
+          "column_description": "账户类型标识",
+          "is_join_key": false,
+          "is_enum": true,
+          "enum_source": "inline",
+          "enum_values": [
+            {
+              "value": "nm",
+              "desc": "普通账户"
+            },
+            {
+              "value": "fc",
+              "desc": "信用账户"
+            }
+          ]
+        },
+        {
+          "column_name": "ccy",
+          "column_cn_name": "币种",
+          "column_type": "varchar(12)",
+          "column_description": "交易币种编码",
+          "is_join_key": false,
+          "is_enum": true,
+          "enum_source": "inline",
+          "enum_values": [
+            {
+              "value": "0",
+              "desc": "人民币"
+            },
+            {
+              "value": "1",
+              "desc": "美元"
+            },
+            {
+              "value": "2",
+              "desc": "港币"
+            }
+          ]
+        },
+        {
+          "column_name": "buy_cnt",
+          "column_cn_name": "买入次数",
+          "column_type": "integer",
+          "column_description": "当日买入该产品的次数",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "buy_mnt",
+          "column_cn_name": "买入数量",
+          "column_type": "numeric(20,4)",
+          "column_description": "当日买入该产品的总数量",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "buy_rake",
+          "column_cn_name": "买入佣金",
+          "column_type": "numeric(20,4)",
+          "column_description": "当日买入产生的佣金费用",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "buy_amt",
+          "column_cn_name": "买入金额",
+          "column_type": "numeric(20,4)",
+          "column_description": "当日买入该产品的总金额",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "buy_fare",
+          "column_cn_name": "买入费用",
+          "column_type": "numeric(20,4)",
+          "column_description": "当日买入产生的其他费用",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "sell_cnt",
+          "column_cn_name": "卖出次数",
+          "column_type": "integer",
+          "column_description": "当日卖出该产品的次数",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "sell_mnt",
+          "column_cn_name": "卖出数量",
+          "column_type": "numeric(20,4)",
+          "column_description": "当日卖出该产品的总数量",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "sell_rake",
+          "column_cn_name": "卖出佣金",
+          "column_type": "numeric(20,4)",
+          "column_description": "当日卖出产生的佣金费用",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "sell_amt",
+          "column_cn_name": "卖出金额",
+          "column_type": "numeric(20,4)",
+          "column_description": "当日卖出该产品的总金额",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "sell_fare",
+          "column_cn_name": "卖出费用",
+          "column_type": "numeric(20,4)",
+          "column_description": "当日卖出产生的其他费用",
+          "is_join_key": false,
+          "is_enum": false
+        }
+      ]
+    },
+    {
+      "table_name": "dim_product",
+      "table_cn_name": "产品属性维表",
+      "table_description": "产品基础信息维度表，粒度为产品，存储产品的分类、名称、代码等属性",
+      "table_alias": "prd",
+      "primary_key": [
+        "prdt_id"
+      ],
+      "partition_key": "",
+      "columns": [
+        {
+          "column_name": "prdt_id",
+          "column_cn_name": "产品ID",
+          "column_type": "varchar(12)",
+          "column_description": "产品唯一标识，全库通用关联键",
+          "is_join_key": true,
+          "related_table": "dwd_cust_hold_d、dwd_cust_tran_d",
+          "is_enum": false
+        },
+        {
+          "column_name": "prdt_name",
+          "column_cn_name": "产品名称",
+          "column_type": "varchar(100)",
+          "column_description": "产品中文名称，如比亚迪、招商银行",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "sor_prdt_id",
+          "column_cn_name": "产品代码",
+          "column_type": "varchar(12)",
+          "column_description": "产品交易代码",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "market_id",
+          "column_cn_name": "市场ID",
+          "column_type": "varchar(50)",
+          "column_description": "产品所属市场标识",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "prdt_type_id",
+          "column_cn_name": "产品二级分类ID",
+          "column_type": "varchar(12)",
+          "column_description": "产品二级分类编码，如A股、科创板",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "prdt_type_name",
+          "column_cn_name": "产品二级分类名称",
+          "column_type": "varchar(40)",
+          "column_description": "产品二级分类中文名称",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "up_prdt_type_id",
+          "column_cn_name": "产品一级分类ID",
+          "column_type": "varchar(12)",
+          "column_description": "产品大类编码",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "up_prdt_type_name",
+          "column_cn_name": "产品一级分类名称",
+          "column_type": "varchar(40)",
+          "column_description": "产品大类中文名称",
+          "is_join_key": false,
+          "is_enum": false
+        }
+      ]
+    },
+    {
+      "table_name": "dim_public",
+      "table_cn_name": "标准化编码字典表",
+      "table_description": "全局通用字典表，存储各类编码对应的中文含义，通过code_type_id区分不同类型的编码",
+      "table_alias": "dict",
+      "primary_key": [
+        "code",
+        "code_type_id"
+      ],
+      "partition_key": "",
+      "columns": [
+        {
+          "column_name": "code",
+          "column_cn_name": "标准字典码",
+          "column_type": "varchar(12)",
+          "column_description": "编码值，与业务表的代码字段关联",
+          "is_join_key": true,
+          "related_table": "各业务表代码字段",
+          "is_enum": false
+        },
+        {
+          "column_name": "code_type_id",
+          "column_cn_name": "字典码类型",
+          "column_type": "varchar(6)",
+          "column_description": "编码类型标识，不同类型对应不同业务含义",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "describe",
+          "column_cn_name": "字典描述",
+          "column_type": "varchar(50)",
+          "column_description": "编码对应的中文含义",
+          "is_join_key": false,
+          "is_enum": false
+        }
+      ]
+    },
+    {
+      "table_name": "dim_branch",
+      "table_cn_name": "营业部表",
+      "table_description": "营业部基础信息维度表，粒度为营业部，存储营业部名称及上下级归属关系",
+      "table_alias": "branch",
+      "primary_key": [
+        "org_id"
+      ],
+      "partition_key": "",
+      "columns": [
+        {
+          "column_name": "data_dt",
+          "column_cn_name": "数据日期",
+          "column_type": "varchar(8)",
+          "column_description": "快照日期，格式yyyymmdd",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "org_id",
+          "column_cn_name": "营业部ID",
+          "column_type": "varchar(50)",
+          "column_description": "营业部唯一标识",
+          "is_join_key": true,
+          "related_table": "ads_cust_info_d",
+          "is_enum": false
+        },
+        {
+          "column_name": "org_name",
+          "column_cn_name": "营业部名称",
+          "column_type": "varchar(100)",
+          "column_description": "营业部中文名称",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "up_org_id",
+          "column_cn_name": "上级营业部/分公司ID",
+          "column_type": "varchar(50)",
+          "column_description": "上级机构唯一标识",
+          "is_join_key": false,
+          "is_enum": false
+        },
+        {
+          "column_name": "up_org_name",
+          "column_cn_name": "上级营业部/分公司名称",
+          "column_type": "varchar(100)",
+          "column_description": "上级机构中文名称",
+          "is_join_key": false,
+          "is_enum": false
+        }
+      ]
+    }
+  ],
+  "table_relationships": [
+    {
+      "from_table": "ads_cust_info_d",
+      "from_column": "pty_id",
+      "to_table": "dws_cust_aset_d",
+      "to_column": "pty_id",
+      "join_type": "left join",
+      "relation_desc": "通过客户号关联客户资产数据，关联时需两边都指定对应data_dt分区"
+    },
+    {
+      "from_table": "ads_cust_info_d",
+      "from_column": "pty_id",
+      "to_table": "dws_cust_fin_d",
+      "to_column": "pty_id",
+      "join_type": "left join",
+      "relation_desc": "通过客户号关联客户资金流动数据"
+    },
+    {
+      "from_table": "ads_cust_info_d",
+      "from_column": "pty_id",
+      "to_table": "dwd_cust_hold_d",
+      "to_column": "pty_id",
+      "join_type": "left join",
+      "relation_desc": "通过客户号关联客户持仓数据"
+    },
+    {
+      "from_table": "ads_cust_info_d",
+      "from_column": "pty_id",
+      "to_table": "dwd_cust_tran_d",
+      "to_column": "pty_id",
+      "join_type": "left join",
+      "relation_desc": "通过客户号关联客户交易数据"
+    },
+    {
+      "from_table": "ads_cust_info_d",
+      "from_column": "org_id",
+      "to_table": "dim_branch",
+      "to_column": "org_id",
+      "join_type": "inner join",
+      "relation_desc": "通过营业部ID关联营业部信息"
+    },
+    {
+      "from_table": "dwd_cust_hold_d",
+      "from_column": "prdt_id",
+      "to_table": "dim_product",
+      "to_column": "prdt_id",
+      "join_type": "inner join",
+      "relation_desc": "通过产品ID关联产品属性信息"
+    },
+    {
+      "from_table": "dwd_cust_tran_d",
+      "from_column": "prdt_id",
+      "to_table": "dim_product",
+      "to_column": "prdt_id",
+      "join_type": "inner join",
+      "relation_desc": "通过产品ID关联产品属性信息"
+    },
+    {
+      "from_table": "ads_cust_info_d",
+      "from_column": "gender_cd",
+      "to_table": "dim_public",
+      "to_column": "code",
+      "join_type": "left join",
+      "relation_desc": "性别代码关联字典表，需额外指定dim_public.code_type_id='500'"
+    },
+    {
+      "from_table": "ads_cust_info_d",
+      "from_column": "edu_cd",
+      "to_table": "dim_public",
+      "to_column": "code",
+      "join_type": "left join",
+      "relation_desc": "学历代码关联字典表，需额外指定dim_public.code_type_id='600'"
+    },
+    {
+      "from_table": "ads_cust_info_d",
+      "from_column": "cust_lvl_cd",
+      "to_table": "dim_public",
+      "to_column": "code",
+      "join_type": "left join",
+      "relation_desc": "客户等级代码关联字典表，需额外指定dim_public.code_type_id='100'"
+    },
+    {
+      "from_table": "ads_cust_info_d",
+      "from_column": "prof_cd",
+      "to_table": "dim_public",
+      "to_column": "code",
+      "join_type": "left join",
+      "relation_desc": "职业代码关联字典表，需额外指定dim_public.code_type_id='700'"
+    }
+  ],
+  "business_metrics": [
+    {
+      "metric_name": "客户总资产",
+      "metric_formula": "coalesce(nm_tot_aset, 0) + coalesce(fc_pur_aset, 0)",
+      "metric_desc": "客户全部账户的总资产合计，等于普通账户总资产加信用账户净资产",
+      "related_tables": [
+        "dws_cust_aset_d"
+      ]
+    },
+    {
+      "metric_name": "客户总交易金额",
+      "metric_formula": "coalesce(buy_amt, 0) + coalesce(sell_amt, 0)",
+      "metric_desc": "客户买入金额加卖出金额的合计，代表总交易规模",
+      "related_tables": [
+        "dwd_cust_tran_d"
+      ]
+    },
+    {
+      "metric_name": "客户总资金流入",
+      "metric_formula": "coalesce(cash_in, 0) + coalesce(tran_in, 0) + coalesce(assign_in, 0)",
+      "metric_desc": "客户所有资金与证券转入的合计",
+      "related_tables": [
+        "dws_cust_fin_d"
+      ]
+    },
+    {
+      "metric_name": "客户总资金流出",
+      "metric_formula": "coalesce(cash_out, 0) + coalesce(tran_out, 0) + coalesce(assign_out, 0)",
+      "metric_desc": "客户所有资金与证券转出的合计",
+      "related_tables": [
+        "dws_cust_fin_d"
+      ]
+    }
+  ]
+}
