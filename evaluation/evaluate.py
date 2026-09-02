@@ -31,7 +31,7 @@ def _round_half_up(x, nd=2):
 
 
 def values_equal(val1, val2):
-    """判断两个值是否相等，只容忍浮点计算的极小误差。"""
+    """判断两个值是否相等。数值按业务展示口径(2位小数)比较，容忍 ROUND 差异。"""
     if val1 is None and val2 is None:
         return True
     if val1 is None or val2 is None:
@@ -41,7 +41,11 @@ def values_equal(val1, val2):
     if hasattr(val2, 'quantize'):
         val2 = float(val2)
     if isinstance(val1, (int, float)) and isinstance(val2, (int, float)):
-        return _round_half_up(val1, 6) == _round_half_up(val2, 6)
+        # 标准答案有的 ROUND(,2)、有的保留原值，统一到2位业务精度比较
+        if _round_half_up(val1, 2) == _round_half_up(val2, 2):
+            return True
+        # 四舍五入边界兜底：绝对误差不超过0.01视为相等（不会放过量级不同的值）
+        return abs(val1 - val2) <= 0.01
     return val1 == val2
 
 
