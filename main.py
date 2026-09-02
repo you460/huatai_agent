@@ -1,7 +1,10 @@
-from openai import OpenAI
 import psycopg2
 import json
 import time
+import http.client
+import ssl
+from types import SimpleNamespace
+from urllib.parse import urlparse
 from config import (
     DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL,
     LLM_TEMPERATURE, LLM_MAX_RETRIES,
@@ -11,11 +14,11 @@ from config import (
 from metadata_tools import search_table, get_table_schema, get_metric, METADATA
 from security_guard import check_sql_safety
 
-# 初始化大模型客户端
-client = OpenAI(
-    api_key=DEEPSEEK_API_KEY,
-    base_url=DEEPSEEK_BASE_URL
-)
+# 用标准库 http.client 直连大模型（绕开 httpx/urllib3 在 Windows 上对 SSL 套接字的兼容问题）
+_API = urlparse(DEEPSEEK_BASE_URL)
+_API_HOST = _API.netloc or "api.deepseek.com"
+_API_PATH = _API.path.rstrip("/") + "/chat/completions"
+_SSL_CTX = ssl.create_default_context()
 
 # 连接数据库
 conn = psycopg2.connect(**DB_CONFIG)
@@ -101,20 +104,35 @@ SYSTEM_PROMPT = f"""你是一个专业的SQL生成助手，专门帮助用户从
 {json.dumps(METADATA['global_rules'], ensure_ascii=False, indent=2)}
 
 补充约定：
-- 只返回纯SQL，不加解释文字、不加markdown代码块标记、不重复输出
+- 【最终回复硬性格式】完成工具调用后，回复必须只含一条可执行SQL，并且首词只能是 SELECT 或 WITH；禁止任何中文分析、确认过程、Markdown代码块、注释、第二段SQL或重复SQL
 - 枚举/字典字段：字段摘要里已内嵌枚举取值（如 gender_cd 字典类型500: 取值[5000002=男,...]）。筛选/过滤直接用内嵌代码值（where gender_cd='5000002'），无需 join 字典表；只有展示中文时才 join dim_public，且 code_type_id 必须用摘要里标注的字典类型（如 '500'）。若摘要标注"...共N个"（取值没内嵌全），用模糊匹配（where b.describe like '%医生%'）
 - 以下三张维表查询时不要加data_dt条件：dim_branch、dim_product、dim_public；只有dwd_/dws_/ads_开头的事实表才需要加data_dt
 - 学历枚举值是"学士""硕士""博士"，不是"本科"；"本科及以上"用 describe IN ('学士','硕士','博士')
-- 只返回问题明确需要的列，不要返回额外统计列（问"平均年龄"就只返回平均年龄，不返回count）
-- 查询"前N的客户"等排名/列表类问题时，返回 pty_id（客户号，不用 name）、排名依据的数值列（如交易金额、总资产）、以及题目要求的属性列
-- 产品分类：一级分类用 up_prdt_type_name，二级分类用 prdt_type_name。"债券"是一级分类(up_prdt_type_name='债券')，"A股/科创板/ETF"是二级分类(prdt_type_name='A股'等)；不要用 prdt_name/prdt_type_name LIKE '%债%' 表示债券，会误纳"交易型债券ETF"等开放式基金
-- 统计"各营业部"要同时返回分公司名(up_org_name)和营业部名(org_name)
+- 只返回题目明确要求的列，不要返回额外/中间列：问"占比/比率"只返回 维度列+占比列（不要返回分子、分母、count等中间列）；问"平均年龄"只返回平均年龄；问"分布/排名"只返回 维度列+聚合指标列
+- 【必须遵守，客户列表与数量】问“哪些客户/查询客户/前N的客户”等列表或排名问题时，返回 pty_id（客户号，不用 name）及题目要求的属性/排名依据；“交易金额前N的客户/总资产前N的客户”等排名题，排名依据本身也是必须返回的列，再返回题目要求的属性，列顺序为 pty_id、排名指标、题目要求的属性。问“客户等级/性别/学历/职业/账户状态”等名称时必须关联 dim_public 返回 describe，不能返回 *_cd 编码；只有题目明确问“多少/数量/人数/几位”时才返回 COUNT，不要把“哪些客户”改成计数
+- 产品分类：一级分类用 up_prdt_type_name（债券/股票/开放式基金/理财产品/衍生品等），二级分类用 prdt_type_name（A股/科创板/创业板/ETF/沪港通/深港通/新三板/北交所/LOF等）。"债券"是一级分类，"A股/科创板/ETF/沪港通/深港通"是二级分类；不要用 prdt_name LIKE '%债%' 表示债券，会误纳"交易型债券ETF"等开放式基金
+- 【必须遵守，机构输出】问“各分公司/每个分公司”时，SELECT 和 GROUP BY 只能包含 b.up_org_name，不能额外返回 b.org_name；问“各营业部/每个营业部”时，SELECT 和 GROUP BY 都必须同时包含 b.up_org_name、b.org_name；只返回 org_name 不算完整答案
+- 【必须遵守，机构与地域】题目出现“XX分公司”是机构条件，必须关联 dim_branch，并用 up_org_name='XX分公司' 筛选；题目出现“XX营业部”必须用 org_name='XX营业部' 筛选。两者都不能用客户表的 prov_name 或 city_name 代替；涉及分公司/营业部时，除客户表外还要搜索“营业部”表。
 - 月份与季度区分：问"X月"指该自然月（"3月"= data_dt between '20260301' and '20260331'），问"Q1"才是季度（between '20260101' and '20260331'），两者不要混用
-- 年龄段默认：<30、[30,50)、[50,60)、[60,)
+- 年龄段默认：<30、[30,50)、[50,60)、[60,)；标签严格用这四种符号，不要用中文标签（如"小于30""大于60"）
 - "普通客户"指客户等级"紫金理财卡客户"(cust_lvl_cd='1000005')，即基础理财卡，不是"非钻石卡客户"；不要用 describe like '%普通%' 或 NOT LIKE '%钻石卡%' 表示（字典里没有"普通"字样）
-- 计算"平均持仓市值/平均持仓金额"：先在子查询按 pty_id 对 mkt_val 求和（一个客户可能持多只产品），再外层 AVG，不要直接 AVG(mkt_val)；且用 LEFT JOIN + coalesce(...,0) 包含所有客户，不要用 INNER JOIN 只统计有持仓的
+- 计算"平均持仓市值/平均持仓金额"：先在子查询按 pty_id 对 mkt_val 求和（一个客户可能持多只产品），再外层 AVG；用 LEFT JOIN 包含所有客户，无持仓客户的持仓值按 0 计入平均，所以外层 AVG 必须包 coalesce(持仓值,0)（AVG(coalesce(h.total_mkt_val,0))），不要直接 AVG（会忽略无持仓客户），不要用 INNER JOIN
+- 计算"平均总资产"：以 ads_cust_info_d 客户快照为主表，LEFT JOIN dws_cust_aset_d 指定日期；无资产记录的客户总资产按 0 计入 AVG。问两个群体的平均总资产差值时，直接用两个未 ROUND 的 AVG 相减，题目未要求时不要提前或额外 ROUND
 - 关联不同表不要在 join 条件里加 data_dt 相等，各表在 where 里各自过滤分区
-- 佣金率/占比/比率类指标返回小数（0.001 表示 0.1%），不要乘100
+- 佣金率/占比/比率类指标返回小数（0.001 表示 0.1%），不要乘100；“整体交易佣金率”= SUM(buy_rake+sell_rake) / NULLIF(SUM(buy_amt+sell_amt),0)，不是客户佣金率的简单平均
+- 产品维度分组：统计"每个产品/各产品"的总市值/总金额/总笔数时，按产品名 prdt_name 分组（同名产品要合并），只返回产品名+汇总值；不要把 prdt_id 加进 GROUP BY 或 SELECT。"产品前N名/交易金额前N的产品/成交笔数前N的产品"也必须先按 prdt_name 汇总，再按该汇总值排序并 LIMIT N；禁止先按 prdt_id 取前N后再展示产品名
+- 占比/比率/渗透率：两个整数相除在SQL里结果恒为0，必须写成 分子*1.0/分母 或 CAST(分子 AS numeric)/分母（例：count(distinct case when ... end)*1.0/count(*)）
+- 【必须遵守，年龄边界】"50岁以上"、"50岁及以上"都包含50岁，必须写 cust_age >= 50，禁止写 cust_age > 50；只有题目说"超过50岁"时才写 cust_age > 50。同理，"X岁以下/及以下"含X岁，用 <= X；"不足X岁"用 < X。
+- 资金转入/流入 = cash_in+tran_in+assign_in 三类合计；资金转出/流出 = cash_out+tran_out+assign_out 三类合计，不要只算其中一类
+- "高净值客户"指总资产(普通账户nm_tot_aset+信用账户fc_pur_aset)超过某阈值的客户，不是客户等级（钻石卡/白金卡等）
+- "盈亏"= 期末总资产 - 期初总资产 + 期间资金流出 - 期间资金流入（净资产变动口径），不是买卖价差；2026年Q1的期初资产快照固定取 data_dt='20260101'，期末取 data_dt='20260331'，不要取上一年末
+- "日均资产"= 期间内每日总资产之和 / 期间天数（2026年Q1为90天），不要除以该客户实际出现天数；日均资产排名或展示时写 ROUND(日均资产,2)
+- "某客户买入/交易金额>X"指该客户在期间内累计金额>X：先按 pty_id 分组 sum 再用 HAVING 过滤，不要按单行(单笔)过滤
+- 产品名筛选用精确匹配 prdt_name='X'，不要用 LIKE '%X%'；【必须遵守，同名股票】招商银行、中国平安等同名股票必须同时写 prdt_name='X' 和 prdt_type_name='A股' 消歧；“普通账户/信用账户”只限制题目直接修饰的表，例如“普通账户持有中国平安”只在持仓表写 h.sys_source='nm'，不能顺带限制招商银行交易表
+- 【必须遵守，持仓市值阈值】题目说“持有X市值超过Y”时，先按客户 pty_id 汇总该产品的 SUM(COALESCE(mkt_val,0))，再用 HAVING SUM(...) > Y 筛选；不能只用单条持仓记录 mkt_val > Y。
+- 数值字段相加/求和前用 coalesce(字段,0) 处理 NULL，避免 NULL 使整行结果为 NULL
+- 【必须遵守，二次聚合】按"XX交易量/金额>阈值"筛选客户后问"营业部/分公司分布/排名"时，先在子查询按 pty_id 聚合并用 HAVING 筛客户，再在外层按 up_org_name、org_name 汇总 sum(交易金额)；最终 GROUP BY 不能包含 pty_id，也不要用 count(客户数)。
+- 问"其持有的产品属于哪些大类/分类"时，按一级分类 up_prdt_type_name + 二级分类 prdt_type_name 分组，返回 sum(mkt_val)（持仓市值），不要只返回去重的分类名、不要用 count(客户数)
 
 示例：
 问：客户信息表中总共有多少位客户
@@ -153,17 +171,62 @@ def extract_sql(text):
     return text
 
 
+def _msg_to_dict(m):
+    """把消息（dict 或 OpenAI 风格对象）统一转成可序列化的 dict。"""
+    if isinstance(m, dict):
+        return m
+    d = {"role": getattr(m, "role", "assistant"), "content": getattr(m, "content", None)}
+    tcs = getattr(m, "tool_calls", None)
+    if tcs:
+        d["tool_calls"] = [
+            {"id": tc.id, "type": getattr(tc, "type", "function"),
+             "function": {"name": tc.function.name, "arguments": tc.function.arguments}}
+            for tc in tcs
+        ]
+    return d
+
+
 def call_llm(messages):
-    """调用大模型，失败自动重试，返回response或None"""
+    """调用大模型，失败自动重试，返回response或None（结构与 openai SDK 兼容）。"""
     for retry in range(LLM_MAX_RETRIES):
         try:
-            return client.chat.completions.create(
-                model=DEEPSEEK_MODEL,
-                messages=messages,
-                tools=TOOLS,
-                tool_choice="auto",
-                temperature=LLM_TEMPERATURE
+            body = json.dumps({
+                "model": DEEPSEEK_MODEL,
+                "messages": [_msg_to_dict(m) for m in messages],
+                "tools": TOOLS,
+                "tool_choice": "auto",
+                "temperature": LLM_TEMPERATURE,
+            }, ensure_ascii=False).encode("utf-8")
+
+            conn = http.client.HTTPSConnection(_API_HOST, 443, context=_SSL_CTX, timeout=180)
+            conn.request("POST", _API_PATH, body=body, headers={
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + DEEPSEEK_API_KEY,
+            })
+            resp = conn.getresponse()
+            data = resp.read().decode("utf-8")
+            conn.close()
+
+            if resp.status != 200:
+                raise Exception(f"HTTP {resp.status}: {data[:200]}")
+
+            j = json.loads(data)
+            msg = j["choices"][0]["message"]
+            tool_calls = msg.get("tool_calls")
+            message = SimpleNamespace(
+                role=msg.get("role", "assistant"),
+                content=msg.get("content"),
+                tool_calls=(
+                    [SimpleNamespace(
+                        id=tc["id"],
+                        type=tc.get("type", "function"),
+                        function=SimpleNamespace(name=tc["function"]["name"],
+                                                 arguments=tc["function"]["arguments"])
+                    ) for tc in tool_calls]
+                    if tool_calls else None
+                ),
             )
+            return SimpleNamespace(choices=[SimpleNamespace(message=message)])
         except Exception as e:
             if retry < LLM_MAX_RETRIES - 1:
                 print(f"大模型调用失败（第{retry+1}次）: {str(e)[:100]}，重试中...")
@@ -236,6 +299,10 @@ def run_agent(question):
                     "content": json.dumps(tool_result, ensure_ascii=False)
                 })
                 print(f"工具返回结果: {json.dumps(tool_result, ensure_ascii=False)[:200]}...")
+            messages.append({
+                "role": "user",
+                "content": "工具结果已提供。若还缺信息可继续调用工具；若可以回答，必须只输出一条以 SELECT 或 WITH 开头的可执行SQL，不要解释。"
+            })
             continue
         
         # 模型返回最终 SQL

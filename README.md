@@ -8,7 +8,7 @@
 - **元数据检索**：通过工具调用让模型按需查表、查字段、查指标，而不是把全库结构塞给模型
 - **安全围栏**：只允许 SELECT，校验表名、字段名和语法，拦截危险操作
 - **Web 图形界面**：Gradio 前端，输入中文问题即可查询，结果表格化展示
-- **自动化评测**：60 道分级测试题，一键跑出准确率报告
+- **自动化评测**：150 道分级测试题，一键跑出准确率报告
 
 ## 技术栈
 
@@ -108,7 +108,7 @@ print(cols, rows)
 python evaluation/evaluate.py
 ```
 
-脚本会跑完 `evaluation/test_questions.json` 里的 60 道题，逐题对比生成结果和标准答案，最后输出按难度的准确率，并把明细写进 `evaluation/eval_results.json`。
+脚本会跑完 `evaluation/test_questions.json` 里的 150 道题，逐题对比生成结果和标准答案，最后输出按难度的准确率，并把明细写进 `evaluation/eval_results.json`。无法执行的标准 SQL 会标记为无效参考题，不计入准确率分母。
 
 ## 安全说明
 

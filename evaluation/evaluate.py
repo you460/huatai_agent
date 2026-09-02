@@ -2,6 +2,15 @@ import json
 import os
 import sys
 import time
+import re
+from decimal import Decimal, ROUND_HALF_UP
+
+# Windows 下 stdout 重定向到文件时默认 GBK 编码，无法输出 emoji，统一改为 UTF-8
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 # 让 evaluation 子目录能 import 父目录的 main
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -9,8 +18,20 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from main import run_agent, execute_sql
 
 
+def _round_half_up(x, nd=2):
+    """数值归一化：四舍五入(half-up)到 nd 位，与 SQL 的 round 一致。
+    Python 内置 round 是银行家舍入，遇到 .xx5 会与 SQL 差 0.01，导致误判。"""
+    try:
+        return float(Decimal(str(x)).quantize(Decimal('1e{}'.format(-nd)), rounding=ROUND_HALF_UP))
+    except Exception:
+        try:
+            return float(x)
+        except Exception:
+            return x
+
+
 def values_equal(val1, val2):
-    """判断两个值是否相等，容忍微小误差和百分比差异。"""
+    """判断两个值是否相等，只容忍浮点计算的极小误差。"""
     if val1 is None and val2 is None:
         return True
     if val1 is None or val2 is None:
@@ -20,202 +41,131 @@ def values_equal(val1, val2):
     if hasattr(val2, 'quantize'):
         val2 = float(val2)
     if isinstance(val1, (int, float)) and isinstance(val2, (int, float)):
-        # 允许微小误差
-        if abs(val1 - val2) < 0.01:
-            return True
-        # 百分比差异，比如 0.1 和 10 视为相等
-        if val1 > 0 and val2 > 0:
-            ratio = max(val1, val2) / min(val1, val2)
-            if 99 < ratio < 101:
-                return True
-        return False
+        return _round_half_up(val1, 6) == _round_half_up(val2, 6)
     return val1 == val2
 
 
-def _is_numeric(v):
-    """判断是不是数值。"""
-    return isinstance(v, (int, float)) or hasattr(v, 'quantize')
+def _rows_equal(row1, row2):
+    return len(row1) == len(row2) and all(
+        values_equal(value1, value2)
+        for value1, value2 in zip(row1, row2)
+    )
 
 
-def _numeric_signature(results):
-    """提取所有数值，返回排序列表。"""
-    nums = []
-    for row in results:
-        for v in row:
-            if v is not None and _is_numeric(v):
-                nums.append(round(float(v), 2))
-    return sorted(nums)
+def _requires_order(question):
+    """排名题的返回顺序有业务含义，普通分组题没有。"""
+    return bool(re.search(r'排名|前\s*\d+|最高|最低|从高到低|从低到高|降序|升序', question))
 
 
-def _text_signature(results):
-    """提取所有非数值，返回字符串列表。"""
-    texts = []
-    for row in results:
-        for v in row:
-            if v is not None and not _is_numeric(v):
-                texts.append(str(v))
-    return sorted(texts)
-
-
-def compare_results(col_names1, results1, col_names2, results2):
-    """对比两个查询结果是否一致。"""
-    # 情况1：都是空结果，算一致
-    if not results1 and not results2:
-        return True
-    if not results1 or not results2:
+def compare_results(col_names1, results1, col_names2, results2, question=''):
+    """按完整行比较查询结果；普通分组题允许行顺序不同。"""
+    if len(col_names1) != len(col_names2):
         return False
-    
-    # 严格对比：单行单列数值
-    if len(results1) == 1 and len(results2) == 1 and len(results1[0]) == 1 and len(results2[0]) == 1:
-        if values_equal(results1[0][0], results2[0][0]):
-            return True
-    
-    # 严格对比：行数相同、列数相同，转成集合忽略顺序
-    if len(results1) == len(results2) and len(results1[0]) == len(results2[0]):
-        set1 = set()
-        for row in results1:
-            normalized = tuple(
-                round(float(x), 2) if hasattr(x, 'quantize') else x
-                for x in row
-            )
-            set1.add(normalized)
-        set2 = set()
-        for row in results2:
-            normalized = tuple(
-                round(float(x), 2) if hasattr(x, 'quantize') else x
-                for x in row
-            )
-            set2.add(normalized)
-        if set1 == set2:
-            return True
-    
-    # 宽松对比：单行多列 vs 单行单列，检查是否有任意一列匹配
-    if len(results1) == 1 and len(results2) == 1:
-        row1 = results1[0]
-        row2 = results2[0]
-        # 如果其中一个是单列，另一个是多列，检查多列中是否有任意一列匹配单列的值
-        if len(row1) == 1 and len(row2) > 1:
-            for val in row2:
-                if values_equal(row1[0], val):
-                    return True
-        if len(row2) == 1 and len(row1) > 1:
-            for val in row1:
-                if values_equal(row2[0], val):
-                    return True
-    
-    # 情况B：忽略第一列维度标签，只比数值列
-    if len(results1) == len(results2) and len(results1[0]) >= 2 and len(results2[0]) >= 2:
-        # 去掉第一列，比剩下的数值列
-        numeric_cols1 = min(len(results1[0]), len(results2[0])) - 1
-        if numeric_cols1 >= 1:
-            set1_numeric = set()
-            for row in results1:
-                normalized = tuple(
-                    round(float(x), 2) if hasattr(x, 'quantize') else x
-                    for x in row[1:1+numeric_cols1]
-                )
-                set1_numeric.add(normalized)
-            set2_numeric = set()
-            for row in results2:
-                normalized = tuple(
-                    round(float(x), 2) if hasattr(x, 'quantize') else x
-                    for x in row[1:1+numeric_cols1]
-                )
-                set2_numeric.add(normalized)
-            if set1_numeric == set2_numeric:
-                return True
-    
-    # 宽松情况C：行数相同，列数可能不同，取列数较少的对比前面的列
-    min_cols = min(len(results1[0]), len(results2[0]))
-    set1 = set()
-    for row in results1:
-        normalized = tuple(
-            round(float(x), 2) if hasattr(x, 'quantize') else x
-            for x in row[:min_cols]
-        )
-        set1.add(normalized)
-    set2 = set()
-    for row in results2:
-        normalized = tuple(
-            round(float(x), 2) if hasattr(x, 'quantize') else x
-            for x in row[:min_cols]
-        )
-        set2.add(normalized)
-    if len(set1) == len(set2) and set1 == set2:
-        return True
-    
-    # 情况D：百分比差异，把一边除以 100 再比
-    # 把其中一个结果的所有数值都除以100，再对比一次
-    if len(results1) == len(results2):
-        # 尝试把results1的数值除以100
-        set1_scaled = set()
-        for row in results1:
-            normalized = tuple(
-                round(float(x) / 100, 4) if hasattr(x, 'quantize') or isinstance(x, (int, float)) else x
-                for x in row[:min_cols]
-            )
-            set1_scaled.add(normalized)
-        set2_normalized = set()
-        for row in results2:
-            normalized = tuple(
-                round(float(x), 4) if hasattr(x, 'quantize') or isinstance(x, (int, float)) else x
-                for x in row[:min_cols]
-            )
-            set2_normalized.add(normalized)
-        if set1_scaled == set2_normalized:
-            return True
-        
-        # 尝试把results2的数值除以100
-        set2_scaled = set()
-        for row in results2:
-            normalized = tuple(
-                round(float(x) / 100, 4) if hasattr(x, 'quantize') or isinstance(x, (int, float)) else x
-                for x in row[:min_cols]
-            )
-            set2_scaled.add(normalized)
-        set1_normalized = set()
-        for row in results1:
-            normalized = tuple(
-                round(float(x), 4) if hasattr(x, 'quantize') or isinstance(x, (int, float)) else x
-                for x in row[:min_cols]
-            )
-            set1_normalized.add(normalized)
-        if set1_normalized == set2_scaled:
-            return True
+    if any(len(row) != len(col_names1) for row in results1):
+        return False
+    if any(len(row) != len(col_names2) for row in results2):
+        return False
+    if not results1 or not results2:
+        return not results1 and not results2
+    if len(results1) != len(results2):
+        return False
+    if _requires_order(question):
+        return all(_rows_equal(row1, row2) for row1, row2 in zip(results1, results2))
 
-    # 最后兜底：数值一致，且文字列互为子集，就判一致
-    num1 = _numeric_signature(results1)
-    num2 = _numeric_signature(results2)
-    if num1 and num2 and num1 == num2:
-        text1 = set(_text_signature(results1))
-        text2 = set(_text_signature(results2))
-        if text1 and text2 and (text1 == text2 or text1 <= text2 or text2 <= text1):
-            return True
+    unmatched_rows = list(results2)
+    for row1 in results1:
+        for index, row2 in enumerate(unmatched_rows):
+            if _rows_equal(row1, row2):
+                unmatched_rows.pop(index)
+                break
+        else:
+            return False
+    return not unmatched_rows
 
-    return False
+
+def is_question_scored(question):
+    """题目未标记时默认计分，避免影响现有题库。"""
+    return question.get('valid_for_scoring', True)
+
+
+def parse_question_ids(value):
+    """解析可选的逗号分隔题号。"""
+    return {int(item.strip()) for item in value.split(',') if item.strip()}
+
+
+def reviewed_value(question, field):
+    """有审核版本时优先使用，官方原内容仍保留在题库中。"""
+    return question.get(f'reviewed_{field}', question[field])
 
 
 def main():
     # 读取测试题
     with open(os.path.join(os.path.dirname(__file__), 'test_questions.json'), 'r', encoding='utf-8') as f:
         questions = json.load(f)
+
+    selected_ids = parse_question_ids(os.environ.get('QUESTION_IDS', ''))
+    if selected_ids:
+        questions = [q for q in questions if q['id'] in selected_ids]
+        result_filename = 'eval_results_subset.json'
+        print(f"仅评测题号: {', '.join(map(str, sorted(selected_ids)))}")
+    else:
+        result_filename = 'eval_results.json'
     
     print(f"共 {len(questions)} 条测试题")
     print("=" * 80)
     
     results = []
     success_count = 0
+    invalid_reference_count = 0
     diff_stats = {"简单": {"total": 0, "success": 0}, "中等": {"total": 0, "success": 0}, "较难": {"total": 0, "success": 0}}
     
     for i, q in enumerate(questions, 1):
-        print(f"\n[{i}/{len(questions)}] {q['difficulty']} - {q['question']}")
+        question = reviewed_value(q, 'question')
+        standard_sql = reviewed_value(q, 'standard_sql')
+        print(f"\n[{i}/{len(questions)}] {q['difficulty']} - {question}")
         print("-" * 60)
-        
+
+        # 已审计确认存在业务问题的标准答案，不调用 Agent，也不计入准确率。
+        if not is_question_scored(q):
+            reason = q.get('reference_note', '题库标记为暂不计分')
+            print(f"⚠️ {reason}")
+            results.append({
+                "id": q['id'],
+                "difficulty": q['difficulty'],
+                "question": question,
+                "success": None,
+                "valid_for_scoring": False,
+                "reason": reason,
+                "generated_sql": None,
+                "standard_sql": standard_sql,
+                "time": 0
+            })
+            invalid_reference_count += 1
+            continue
+
+        # 先验证标准答案。无效参考题不调用Agent，也不进入准确率分母。
+        col_names2, results2, error2 = execute_sql(standard_sql)
+        if error2:
+            print(f"⚠️ 标准答案SQL执行出错，本题不计分: {error2}")
+            results.append({
+                "id": q['id'],
+                "difficulty": q['difficulty'],
+                "question": question,
+                "success": None,
+                "valid_for_scoring": False,
+                "reason": f"标准答案SQL执行出错: {error2}",
+                "generated_sql": None,
+                "standard_sql": standard_sql,
+                "time": 0
+            })
+            invalid_reference_count += 1
+            continue
+
         start_time = time.time()
         
         # 1. 让Agent生成SQL
         try:
-            generated_sql = run_agent(q['question'])
+            generated_sql = run_agent(question)
         except Exception as e:
             generated_sql = None
             print(f"❌ Agent调用出错: {e}")
@@ -227,8 +177,9 @@ def main():
             results.append({
                 "id": q['id'],
                 "difficulty": q['difficulty'],
-                "question": q['question'],
+                "question": question,
                 "success": False,
+                "valid_for_scoring": True,
                 "reason": "生成SQL失败",
                 "generated_sql": None,
                 "time": gen_time
@@ -244,8 +195,9 @@ def main():
             results.append({
                 "id": q['id'],
                 "difficulty": q['difficulty'],
-                "question": q['question'],
+                "question": question,
                 "success": False,
+                "valid_for_scoring": True,
                 "reason": f"生成SQL执行出错: {error1}",
                 "generated_sql": generated_sql,
                 "time": gen_time
@@ -253,27 +205,10 @@ def main():
             diff_stats[q['difficulty']]["total"] += 1
             continue
         
-        # 3. 执行标准答案SQL
-        col_names2, results2, error2 = execute_sql(q['standard_sql'])
-        if error2:
-            print(f"⚠️ 标准答案SQL执行出错: {error2}")
-            # 标准答案出错不判失败，跳过
-            results.append({
-                "id": q['id'],
-                "difficulty": q['difficulty'],
-                "question": q['question'],
-                "success": True,  # 标准答案出错不算我们失败
-                "reason": "标准答案SQL执行出错，跳过",
-                "generated_sql": generated_sql,
-                "time": gen_time
-            })
-            success_count += 1
-            diff_stats[q['difficulty']]["total"] += 1
-            diff_stats[q['difficulty']]["success"] += 1
-            continue
-        
-        # 4. 对比结果
-        is_correct = compare_results(col_names1, results1, col_names2, results2)
+        # 3. 对比结果
+        is_correct = compare_results(
+            col_names1, results1, col_names2, results2, question
+        )
         
         if is_correct:
             print(f"✅ 正确（耗时{gen_time:.1f}s）")
@@ -288,23 +223,30 @@ def main():
         results.append({
             "id": q['id'],
             "difficulty": q['difficulty'],
-            "question": q['question'],
+            "question": question,
             "success": is_correct,
+            "valid_for_scoring": True,
             "reason": "结果一致" if is_correct else "结果不一致",
             "generated_sql": generated_sql,
-            "standard_sql": q['standard_sql'],
+            "standard_sql": standard_sql,
             "time": gen_time
         })
         diff_stats[q['difficulty']]["total"] += 1
     
+    scored_count = len(questions) - invalid_reference_count
+    failed_count = scored_count - success_count
+    accuracy = success_count / scored_count * 100 if scored_count else 0
+
     # 输出总结
     print("\n" + "=" * 80)
     print("评测总结")
     print("=" * 80)
     print(f"总题数: {len(questions)}")
+    print(f"有效计分题: {scored_count}")
+    print(f"无效参考题: {invalid_reference_count}")
     print(f"成功: {success_count}")
-    print(f"失败: {len(questions) - success_count}")
-    print(f"整体准确率: {success_count / len(questions) * 100:.1f}%")
+    print(f"失败: {failed_count}")
+    print(f"整体准确率: {accuracy:.1f}%")
     print()
     
     for diff, stats in diff_stats.items():
@@ -313,18 +255,20 @@ def main():
             print(f"{diff}: {stats['success']}/{stats['total']} ({rate:.1f}%)")
     
     # 保存详细结果
-    with open(os.path.join(os.path.dirname(__file__), 'eval_results.json'), 'w', encoding='utf-8') as f:
+    with open(os.path.join(os.path.dirname(__file__), result_filename), 'w', encoding='utf-8') as f:
         json.dump({
             "summary": {
                 "total": len(questions),
+                "scored": scored_count,
+                "invalid_reference": invalid_reference_count,
                 "success": success_count,
-                "accuracy": success_count / len(questions) * 100,
+                "accuracy": accuracy,
                 "by_difficulty": diff_stats
             },
             "details": results
         }, f, ensure_ascii=False, indent=2)
     
-    print(f"\n详细结果已保存到 eval_results.json")
+    print(f"\n详细结果已保存到 {result_filename}")
 
 
 if __name__ == "__main__":

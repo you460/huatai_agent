@@ -1,10 +1,19 @@
 import sqlglot
+from sqlglot.optimizer.scope import traverse_scope
 from metadata_tools import METADATA
 
 
 # 从元数据中提取所有合法的表名和字段名
 VALID_TABLES = set()
 VALID_COLUMNS = {}  # 表名 -> 字段名集合
+
+# 只允许返回查询结果的顶层语句。WITH ... SELECT 在 sqlglot 中的顶层节点仍是 SELECT。
+READ_ONLY_QUERY_TYPES = {'SELECT', 'UNION', 'INTERSECT', 'EXCEPT'}
+FORBIDDEN_NODE_TYPES = {
+    'ALTER', 'COMMAND', 'COMMIT', 'COPY', 'CREATE', 'DELETE', 'DROP',
+    'GRANT', 'INSERT', 'LOCK', 'MERGE', 'REVOKE', 'ROLLBACK',
+    'TRANSACTION', 'TRUNCATE', 'UPDATE',
+}
 
 for table in METADATA['tables']:
     table_name = table['table_name']
@@ -16,66 +25,59 @@ for table in METADATA['tables']:
 
 def check_sql_safety(sql):
     """检查 SQL 是否安全，返回是否安全和错误信息。"""
-    # 检查1：只允许SELECT
-    sql_upper = sql.strip().upper()
-    if not sql_upper.startswith('SELECT') and not sql_upper.startswith('WITH'):
-        return False, "只允许SELECT查询语句，禁止其他操作"
-    
-    # 检查2：语法检查
+    if not isinstance(sql, str) or not sql.strip():
+        return False, "SQL不能为空"
+
+    # 检查1：解析完整 SQL，并且只允许一条语句
     try:
-        parsed = sqlglot.parse_one(sql, read='postgres')
+        statements = [item for item in sqlglot.parse(sql, read='postgres') if item]
     except Exception as e:
         return False, f"SQL语法错误: {str(e)[:100]}"
-    
-    # 检查3：表名校验
-    if parsed:
-        try:
-            # 收集 CTE 别名，这些不是真实表
-            cte_aliases = set()
-            for cte in parsed.find_all(sqlglot.exp.CTE):
-                if cte.alias:
-                    cte_aliases.add(cte.alias)
-            
-            tables_in_sql = set()
-            for table in parsed.find_all(sqlglot.exp.Table):
-                table_name = table.name
-                # 跳过CTE别名和子查询别名
-                if table_name in cte_aliases:
-                    continue
-                tables_in_sql.add(table_name)
-                if table_name not in VALID_TABLES:
-                    return False, f"表名不存在: {table_name}，合法表名: {', '.join(sorted(VALID_TABLES))}"
-        except Exception as e:
-            pass  # 表名校验出错不阻断
-    
-    # 检查4：字段名校验
-    if parsed:
-        try:
-            for column in parsed.find_all(sqlglot.exp.Column):
-                col_name = column.name
+
+    if len(statements) != 1:
+        return False, "一次只允许执行一条SELECT查询语句"
+
+    parsed = statements[0]
+    if parsed.__class__.__name__.upper() not in READ_ONLY_QUERY_TYPES:
+        return False, "只允许SELECT查询语句，禁止其他操作"
+
+    # 检查2：即使顶层是 SELECT，也禁止数据修改 CTE 等写操作节点
+    node_types = {node.__class__.__name__.upper() for node in parsed.walk()}
+    forbidden_types = sorted(node_types & FORBIDDEN_NODE_TYPES)
+    if forbidden_types:
+        return False, f"检测到禁止的SQL操作: {', '.join(forbidden_types)}"
+
+    # 检查3：表名校验。校验过程异常时必须拒绝，避免安全检查失效后放行。
+    try:
+        cte_aliases = {
+            cte.alias
+            for cte in parsed.find_all(sqlglot.exp.CTE)
+            if cte.alias
+        }
+
+        for table in parsed.find_all(sqlglot.exp.Table):
+            table_name = table.name
+            if table_name in cte_aliases:
+                continue
+            if table_name not in VALID_TABLES:
+                return False, f"表名不存在: {table_name}，合法表名: {', '.join(sorted(VALID_TABLES))}"
+    except Exception as e:
+        return False, f"表名安全校验失败: {str(e)[:100]}"
+
+    # 检查4：按查询作用域校验带别名的字段；未限定字段仍由数据库负责判定。
+    try:
+        for scope in traverse_scope(parsed):
+            for column in scope.columns:
                 table_alias = column.table
-                
-                # 如果字段指定了表别名，需要找到对应的真实表名
-                if table_alias:
-                    # 从SQL中找别名对应的真实表名
-                    real_table = find_table_by_alias(parsed, table_alias)
-                    if real_table and real_table in VALID_COLUMNS:
-                        if col_name not in VALID_COLUMNS[real_table]:
-                            return False, f"字段名不存在: {real_table}.{col_name}"
-        except Exception as e:
-            # 字段名校验出错不阻断，只记录
-            pass
+                source = scope.sources.get(table_alias) if table_alias else None
+                if isinstance(source, sqlglot.exp.Table):
+                    real_table = source.name
+                    if real_table in VALID_COLUMNS and column.name not in VALID_COLUMNS[real_table]:
+                        return False, f"字段名不存在: {real_table}.{column.name}"
+    except Exception as e:
+        return False, f"字段名安全校验失败: {str(e)[:100]}"
     
     return True, None
-
-
-def find_table_by_alias(parsed, alias):
-    """按别名找真实表名。"""
-    for table in parsed.find_all(sqlglot.exp.Table):
-        if table.alias == alias:
-            return table.name
-    return None
-
 
 # 测试代码
 if __name__ == '__main__':
