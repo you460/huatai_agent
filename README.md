@@ -1,14 +1,14 @@
 # 智能取数 Agent
-# 1
+
 客户营销场景下的自然语言取数系统。业务人员用中文提问，系统自动生成 SQL、执行并返回结果，不用写代码也能查数据。
 
 ## 功能
 
-- **自然语言问数**：输入中文问题，自动拆解意图、生成 PostgreSQL SQL 并执行
-- **元数据检索**：通过工具调用让模型按需查表、查字段、查指标，而不是把全库结构塞给模型
-- **安全围栏**：只允许 SELECT，校验表名、字段名和语法，拦截危险操作
-- **Web 图形界面**：Gradio 前端，输入中文问题即可查询，结果表格化展示
-- **自动化评测**：150 道分级测试题，一键跑出准确率报告
+- 自然语言问数：输入中文问题，自动拆解意图、生成 PostgreSQL SQL 并执行
+- 元数据检索：通过工具调用让模型按需查表、查字段、查指标，而不是把全库结构塞给模型
+- 安全围栏：只允许 SELECT，校验表名、字段名和语法，拦截危险操作
+- Web 图形界面：Gradio 前端，输入中文问题即可查询，结果表格化展示
+- 自动化评测：官方7题、30题泛化集、固定90题主回归集分别输出可信度报告，并保留150题完整回归入口
 
 ## 技术栈
 
@@ -31,8 +31,16 @@ huatai_agent/
 │   └── metadata.json    # 元数据：表结构、字段、枚举、关联关系、业务指标
 ├── evaluation/          # 评测（独立目录）
 │   ├── evaluate.py      # 评测脚本
-│   ├── test_questions.json
-│   └── eval_results.json
+│   ├── test_questions.json             # 原150题与基准SQL
+│   ├── generalization_questions.json   # 30道独立改写题
+│   ├── field_contracts.json            # 字段语义与排序合同
+│   ├── suites.json                     # 固定评测集定义
+│   ├── build_questions.py              # 原题库构建工具
+│   ├── build_generalization_questions.py # 泛化题构建工具
+│   ├── eval_results_v2_official7_<timestamp>.json
+│   ├── eval_results_v2_generalization30_<timestamp>.json
+│   └── eval_results_v2_compact90_<timestamp>.json
+├── tests/                # 单元与回归测试
 ├── requirements.txt     # 依赖
 └── .env.example         # 配置模板
 ```
@@ -95,21 +103,34 @@ python main.py
 `main.py` 末尾有一个示例问题列表，改成自己想问的问题即可。也可以直接在代码里调用：
 
 ```python
-from main import run_agent, execute_sql
+from main import run_agent
 
-sql = run_agent("男性客户有多少个")
-cols, rows, err = execute_sql(sql)
-print(cols, rows)
+result = run_agent("男性客户有多少个", return_result=True)
+print(result.columns, result.rows)
 ```
 
 ## 评测
 
 ```bash
+# 默认运行固定精简回归集：90题，每个难度30题，包含全部7道官方样例
 python evaluation/evaluate.py
+
+# 单独观察7道官方Q&A样例
+python evaluation/evaluate.py --suite official7
+
+# 独立运行30道同义改写泛化题，成绩与回归集分开报告
+python evaluation/evaluate.py --suite generalization30
+
+# 需要时运行历史完整150题回归集
+python evaluation/evaluate.py --suite full150
 ```
 
-脚本会跑完 `evaluation/test_questions.json` 里的 150 道题，逐题对比生成结果和标准答案，最后输出按难度的准确率，并把明细写进 `evaluation/eval_results.json`。无法执行的标准 SQL 会标记为无效参考题，不计入准确率分母。
+评测集定义保存在 `evaluation/suites.json`。默认的 `compact90` 按题号全区间固定等距抽取，不依据模型历史得分挑题；原150题和基准SQL继续保留。当前正式依据由最新的 `official7`、`generalization30` 和 `compact90` 三份结果组成。报告分别记录 `value_match`、`schema_match`、`overall_success`、难度分层、官方/自建来源表现和平均Agent耗时，并按时间戳生成新文件，便于每轮完成后替换旧输出。
+
+这90题属于内部回归基准。7道 `source=official` 的题目来自官方Q&A示例，只能说明对公开样例的兼容性，不能代表官方隐藏测试成绩。`generalization30`复用基础题的基准SQL，但改写自然语言表达，并按改写类型单独统计；它用于观察表达泛化，不能替代官方隐藏测试。泛化题一旦开始用于调整提示词，就应冻结并另建新的留出集。
+
+字段语义合同保存在 `evaluation/field_contracts.json`。可为指定题号配置预期语义、允许别名和排序规则；未显式配置的题目会从基准 SQL 返回列生成默认合同。排名题默认允许同一主排序值的行互换顺序；若业务要求固定并列顺序，需要在合同中设为 `fixed`，并让两侧 SQL 都声明二级 `ORDER BY`。
 
 ## 安全说明
 
-系统只允许 SELECT 查询，DROP / DELETE / UPDATE 等操作会被安全围栏拦截。提交代码时 `.env` 不会被包含（已加入 `.gitignore`）。
+系统只允许只读 SELECT / WITH 查询，危险函数、写操作和无 `LIMIT` 的明细查询会被安全围栏拦截。每次查询使用独立只读数据库连接，默认超时为 10 秒、最多返回 5000 行；可通过 `.env` 中的 `SQL_STATEMENT_TIMEOUT_MS` 和 `SQL_MAX_RESULT_ROWS` 调整。聚合统计不会被自动加 `LIMIT`，计算口径不受展示行数限制影响。提交代码时 `.env` 不会被包含（已加入 `.gitignore`）。

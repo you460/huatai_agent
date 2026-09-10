@@ -1,0 +1,272 @@
+[
+  {
+    "id": 1001,
+    "base_id": 1,
+    "difficulty": "简单",
+    "question": "请统计最新客户快照中的客户总人数",
+    "standard_sql": "select count(*) as cust_cnt from ads_cust_info_d where data_dt='20260531'",
+    "source": "generalization",
+    "variant_type": "synonym"
+  },
+  {
+    "id": 1002,
+    "base_id": 2,
+    "difficulty": "简单",
+    "question": "最新客户名单里，男性一共有多少人",
+    "standard_sql": "select count(*) as male_cnt from ads_cust_info_d where data_dt='20260531' and gender_cd='5000002'",
+    "source": "generalization",
+    "variant_type": "word_order"
+  },
+  {
+    "id": 1003,
+    "base_id": 5,
+    "difficulty": "简单",
+    "question": "客户等级为白金卡的一共有多少人",
+    "standard_sql": "select count(*) as cust_cnt from ads_cust_info_d where data_dt='20260531' and cust_lvl_cd='1000002'",
+    "source": "generalization",
+    "variant_type": "synonym"
+  },
+  {
+    "id": 1004,
+    "base_id": 9,
+    "difficulty": "简单",
+    "question": "还不到30岁的客户共有几位",
+    "standard_sql": "select count(*) as cust_cnt from ads_cust_info_d where data_dt='20260531' and cust_age<30",
+    "source": "generalization",
+    "variant_type": "boundary_expression"
+  },
+  {
+    "id": 1005,
+    "base_id": 13,
+    "difficulty": "简单",
+    "question": "客户归属省份为江苏省的有多少人",
+    "standard_sql": "select count(*) as cust_cnt from ads_cust_info_d where data_dt='20260531' and prov_name='江苏省'",
+    "source": "generalization",
+    "variant_type": "word_order"
+  },
+  {
+    "id": 1006,
+    "base_id": 20,
+    "difficulty": "简单",
+    "question": "A股这一产品子类总共有多少只产品",
+    "standard_sql": "select count(*) as prdt_cnt from dim_product where prdt_type_name='A股'",
+    "source": "generalization",
+    "variant_type": "business_term"
+  },
+  {
+    "id": 1007,
+    "base_id": 25,
+    "difficulty": "简单",
+    "question": "截至2026年一季度末，全市场客户持仓市值合计是多少",
+    "standard_sql": "select coalesce(sum(mkt_val),0) as tot_mkt_val from dwd_cust_hold_d where data_dt='20260331'",
+    "source": "generalization",
+    "variant_type": "time_expression"
+  },
+  {
+    "id": 1008,
+    "base_id": 29,
+    "difficulty": "简单",
+    "question": "最新快照下客户年龄的均值是多少",
+    "standard_sql": "select round(avg(cust_age),2) as avg_age from ads_cust_info_d where data_dt='20260531'",
+    "source": "generalization",
+    "variant_type": "metric_expression"
+  },
+  {
+    "id": 1009,
+    "base_id": 37,
+    "difficulty": "简单",
+    "question": "男性客户中年龄至少达到50岁的有多少人",
+    "standard_sql": "select count(*) as cust_cnt from ads_cust_info_d where data_dt='20260531' and cust_age>=50 and gender_cd='5000002'",
+    "source": "generalization",
+    "variant_type": "boundary_expression"
+  },
+  {
+    "id": 1010,
+    "base_id": 45,
+    "difficulty": "简单",
+    "question": "一季度末普通账户现金资产超过10万元的客户数",
+    "standard_sql": "select count(*) as cust_cnt from dws_cust_aset_d where data_dt='20260331' and nm_bal>100000",
+    "source": "generalization",
+    "variant_type": "time_expression"
+  },
+  {
+    "id": 1011,
+    "base_id": 51,
+    "difficulty": "中等",
+    "question": "男性中学历至少为学士且年龄超过50岁的人数",
+    "standard_sql": "select count(*)\nfrom ads_cust_info_d a\nleft join dim_public b on a.edu_cd = b.code and b.code_type_id='600'\nleft join dim_public c on a.gender_cd = c.code and c.code_type_id='500'\nwhere a.data_dt='20260531'\nand b.describe in ('博士','硕士','学士') and c.describe in ('男')\nand a.cust_age>50",
+    "source": "generalization",
+    "variant_type": "condition_reorder"
+  },
+  {
+    "id": 1012,
+    "base_id": 55,
+    "difficulty": "中等",
+    "question": "按性别分别统计客户人数",
+    "standard_sql": "select b.describe as gender_name, count(*) as cust_cnt from ads_cust_info_d a left join dim_public b on a.gender_cd = b.code and b.code_type_id='500' where a.data_dt='20260531' group by b.describe",
+    "source": "generalization",
+    "variant_type": "synonym"
+  },
+  {
+    "id": 1013,
+    "base_id": 61,
+    "difficulty": "中等",
+    "question": "一季度每位客户累计成交金额是多少",
+    "standard_sql": "select pty_id, sum(coalesce(buy_amt,0) + coalesce(sell_amt,0)) as tot_tran_amt from dwd_cust_tran_d where data_dt between '20260101' and '20260331' group by pty_id",
+    "source": "generalization",
+    "variant_type": "metric_expression"
+  },
+  {
+    "id": 1014,
+    "base_id": 67,
+    "difficulty": "中等",
+    "question": "每个分公司下设多少个营业部",
+    "standard_sql": "select up_org_name, count(distinct org_id) as branch_cnt from dim_branch group by up_org_name order by branch_cnt desc",
+    "source": "generalization",
+    "variant_type": "word_order"
+  },
+  {
+    "id": 1015,
+    "base_id": 72,
+    "difficulty": "中等",
+    "question": "分别汇总普通系统来源和信用系统来源在一季度的成交额",
+    "standard_sql": "select sys_source, sum(coalesce(buy_amt,0)+coalesce(sell_amt,0)) as tot_tran_amt from dwd_cust_tran_d where data_dt between '20260101' and '20260331' group by sys_source",
+    "source": "generalization",
+    "variant_type": "business_term"
+  },
+  {
+    "id": 1016,
+    "base_id": 77,
+    "difficulty": "中等",
+    "question": "各分公司客户人数由高到低排列",
+    "standard_sql": "select b.up_org_name, count(distinct a.pty_id) as cust_cnt from ads_cust_info_d a join dim_branch b on a.org_id=b.org_id where a.data_dt='20260531' group by b.up_org_name order by cust_cnt desc",
+    "source": "generalization",
+    "variant_type": "ranking_expression"
+  },
+  {
+    "id": 1017,
+    "base_id": 82,
+    "difficulty": "中等",
+    "question": "按产品子类对一季度成交额进行排名",
+    "standard_sql": "select p.prdt_type_name, sum(coalesce(t.buy_amt,0)+coalesce(t.sell_amt,0)) as tran_amt from dwd_cust_tran_d t join dim_product p on t.prdt_id=p.prdt_id where t.data_dt between '20260101' and '20260331' group by p.prdt_type_name order by tran_amt desc",
+    "source": "generalization",
+    "variant_type": "business_term"
+  },
+  {
+    "id": 1018,
+    "base_id": 89,
+    "difficulty": "中等",
+    "question": "一季度末持有ETF的客户共有多少人",
+    "standard_sql": "select count(distinct a.pty_id) as cust_cnt from dwd_cust_hold_d a join dim_product b on a.prdt_id=b.prdt_id where a.data_dt='20260331' and b.prdt_type_name='ETF'",
+    "source": "generalization",
+    "variant_type": "time_expression"
+  },
+  {
+    "id": 1019,
+    "base_id": 95,
+    "difficulty": "中等",
+    "question": "按学历层次统计男性客户人数",
+    "standard_sql": "select b.describe as edu_name, count(*) as cust_cnt from ads_cust_info_d a left join dim_public b on a.edu_cd=b.code and b.code_type_id='600' where a.data_dt='20260531' and a.gender_cd='5000002' group by b.describe order by cust_cnt desc",
+    "source": "generalization",
+    "variant_type": "synonym"
+  },
+  {
+    "id": 1020,
+    "base_id": 100,
+    "difficulty": "中等",
+    "question": "按营业部统计客户一季度成交额并进行排名",
+    "standard_sql": "select c.up_org_name, c.org_name, sum(coalesce(b.buy_amt,0)+coalesce(b.sell_amt,0)) as tran_tot from ads_cust_info_d a join dwd_cust_tran_d b on a.pty_id=b.pty_id and b.data_dt between '20260101' and '20260331' join dim_branch c on a.org_id=c.org_id where a.data_dt='20260531' group by c.up_org_name, c.org_name order by tran_tot desc",
+    "source": "generalization",
+    "variant_type": "ranking_expression"
+  },
+  {
+    "id": 1021,
+    "base_id": 101,
+    "difficulty": "较难",
+    "question": "筛选年龄超过40岁的钻石卡男性、比亚迪持仓市值累计超1000元的客户，给出其2026年一季度盈亏情况明细",
+    "standard_sql": "with custinfo as\n(select pty_id\nfrom ads_cust_info_d a\nleft join dim_public b on a.cust_lvl_cd=b.code and b.code_type_id='100'\nleft join dim_public c on a.gender_cd=c.code and c.code_type_id='500'\nwhere a.data_dt='20260531' and b.describe='紫金理财钻石卡客户' and c.describe='男'\nand a.cust_age>40\n), prdtinfo as\n(select a.pty_id,sum(a.mkt_val) as mkt_val\nfrom dwd_cust_hold_d a\ninner join dim_product b on a.prdt_id=b.prdt_id\nwhere b.prdt_name='比亚迪' and a.data_dt='20260331'\nand exists(select 1 from custinfo z where a.pty_id=z.pty_id)\ngroup by a.pty_id\nhaving sum(a.mkt_val)>1000\n)\nselect a.pty_id\n     ,coalesce(c.nm_tot_aset,0)+coalesce(c.fc_pur_aset,0) as bgn_aset\n     ,coalesce(b.nm_tot_aset,0)+coalesce(b.fc_pur_aset,0) as end_aset\n     ,coalesce(d.aset_in,0) as aset_in\n     ,coalesce(d.aset_out,0) as aset_out\n     ,coalesce(b.nm_tot_aset,0)+coalesce(b.fc_pur_aset,0)-coalesce(c.nm_tot_aset,0)-coalesce(c.fc_pur_aset,0)+coalesce(d.aset_out,0)-coalesce(d.aset_in,0) as aset_pft\nfrom prdtinfo a\nleft join dws_cust_aset_d b on a.pty_id=b.pty_id and b.data_dt='20260331'\nleft join dws_cust_aset_d c on a.pty_id=c.pty_id and c.data_dt='20260101'\nleft join\n(\nselect pty_id\n      ,sum(cash_in)+sum(tran_in)+sum(assign_in) as aset_in\n      ,sum(cash_out)+sum(tran_out)+sum(assign_out) as aset_out\nfrom dws_cust_fin_d\nwhere data_dt between '20260101' and '20260331'\ngroup by pty_id\n) d on a.pty_id=d.pty_id",
+    "source": "generalization",
+    "variant_type": "condition_reorder"
+  },
+  {
+    "id": 1022,
+    "base_id": 102,
+    "difficulty": "较难",
+    "question": "找出2026年一季度交易过招商银行，同时季末普通账户持有中国平安的客户",
+    "standard_sql": "with cust_tran as\n(\nselect pty_id,prdt_id,sum(buy_amt) as buy_tot,sum(sell_amt) as sell_tot\nfrom dwd_cust_tran_d\nwhere data_dt between '20260101' and '20260331'\nand prdt_id in (\nselect prdt_id from dim_product\nwhere prdt_name='招商银行' and prdt_type_name='A股'\n)\ngroup by pty_id,prdt_id\n)\nselect a.pty_id\nfrom cust_tran a\ninner join\n(\nselect a.*\nfrom dwd_cust_hold_d a\nwhere prdt_id in (select prdt_id from dim_product where prdt_name='中国平安' and prdt_type_name='A股')\nand a.data_dt='20260331' and a.sys_source='nm'\n) b on a.pty_id=b.pty_id",
+    "source": "generalization",
+    "variant_type": "condition_reorder"
+  },
+  {
+    "id": 1023,
+    "base_id": 133,
+    "difficulty": "较难",
+    "question": "按省份统计2026年一季度创业板累计成交额超过20万元的客户人数",
+    "standard_sql": "select c.prov_name, count(distinct t.pty_id) as cust_cnt from ads_cust_info_d c join (select a.pty_id from dwd_cust_tran_d a join dim_product b on a.prdt_id=b.prdt_id where a.data_dt between '20260101' and '20260331' and b.prdt_type_name='创业板' group by a.pty_id having sum(coalesce(a.buy_amt,0)+coalesce(a.sell_amt,0))>200000) t on c.pty_id=t.pty_id where c.data_dt='20260531' group by c.prov_name order by cust_cnt desc",
+    "source": "generalization",
+    "variant_type": "condition_reorder"
+  },
+  {
+    "id": 1024,
+    "base_id": 104,
+    "difficulty": "较难",
+    "question": "统计2026年1月10日至2月15日科创板累计成交额超25万元客户的营业部分布",
+    "standard_sql": "select c.up_org_name,c.org_name,sum(b.tran_amt) as tran_amt\nfrom ads_cust_info_d a\ninner join\n(\nselect a.pty_id,sum(buy_amt)+sum(sell_amt) as tran_amt\nfrom dwd_cust_tran_d a\ninner join dim_product b on a.prdt_id=b.prdt_id and b.prdt_type_name='科创板'\nwhere a.data_dt between '20260110' and '20260215'\ngroup by a.pty_id\nhaving sum(buy_amt)+sum(sell_amt)>250000\n) b on a.pty_id=b.pty_id\nleft join dim_branch c on a.org_id=c.org_id\ngroup by c.up_org_name,c.org_name",
+    "source": "generalization",
+    "variant_type": "time_expression"
+  },
+  {
+    "id": 1025,
+    "base_id": 116,
+    "difficulty": "较难",
+    "question": "2026年一季度发生过资金转入、但期末不存在正资产的客户数",
+    "standard_sql": "with fin_cust as (select distinct pty_id from dws_cust_fin_d where data_dt between '20260101' and '20260331' and (cash_in > 0 or tran_in > 0 or assign_in > 0)) select count(*) as cust_cnt from fin_cust f where not exists (select 1 from dws_cust_aset_d a where a.pty_id = f.pty_id and a.data_dt='20260331' and (coalesce(a.nm_tot_aset,0)+coalesce(a.fc_pur_aset,0)) > 0)",
+    "source": "generalization",
+    "variant_type": "negative_condition"
+  },
+  {
+    "id": 1026,
+    "base_id": 121,
+    "difficulty": "较难",
+    "question": "客户平均总资产最高的十个营业部",
+    "standard_sql": "select b.up_org_name, b.org_name, avg(coalesce(a.nm_tot_aset,0)+coalesce(a.fc_pur_aset,0)) as avg_tot_aset from ads_cust_info_d c left join dws_cust_aset_d a on c.pty_id = a.pty_id and a.data_dt='20260331' inner join dim_branch b on c.org_id = b.org_id where c.data_dt='20260531' group by b.up_org_name, b.org_name order by avg_tot_aset desc limit 10",
+    "source": "generalization",
+    "variant_type": "ranking_expression"
+  },
+  {
+    "id": 1027,
+    "base_id": 134,
+    "difficulty": "较难",
+    "question": "按分公司给出钻石卡客户所占比例",
+    "standard_sql": "select b.up_org_name, count(distinct case when a.cust_lvl_cd='1000001' then a.pty_id end)*1.0/count(distinct a.pty_id) as diamond_ratio from ads_cust_info_d a join dim_branch b on a.org_id=b.org_id where a.data_dt='20260531' group by b.up_org_name order by diamond_ratio desc",
+    "source": "generalization",
+    "variant_type": "projection_expression"
+  },
+  {
+    "id": 1028,
+    "base_id": 143,
+    "difficulty": "较难",
+    "question": "以实际持仓产品一级类别统计客户覆盖率",
+    "standard_sql": "select p.up_prdt_type_name, count(distinct h.pty_id)*1.0/(select count(*) from ads_cust_info_d where data_dt='20260531') as penetration from dwd_cust_hold_d h join dim_product p on h.prdt_id=p.prdt_id where h.data_dt='20260331' group by p.up_prdt_type_name order by penetration desc",
+    "source": "generalization",
+    "variant_type": "business_term"
+  },
+  {
+    "id": 1029,
+    "base_id": 145,
+    "difficulty": "较难",
+    "question": "计算女性客户人均持仓市值减去男性客户人均持仓市值",
+    "standard_sql": "with hold as (select pty_id, sum(mkt_val) as hv from dwd_cust_hold_d where data_dt='20260331' group by pty_id) select avg(case when c.gender_cd='5000003' then coalesce(h.hv,0) end) - avg(case when c.gender_cd='5000002' then coalesce(h.hv,0) end) as hold_diff from ads_cust_info_d c left join hold h on c.pty_id=h.pty_id where c.data_dt='20260531'",
+    "source": "generalization",
+    "variant_type": "metric_expression"
+  },
+  {
+    "id": 1030,
+    "base_id": 150,
+    "difficulty": "较难",
+    "question": "季末持有ETF且一季度发生过任意产品交易的客户数",
+    "standard_sql": "select count(distinct h.pty_id) as cust_cnt from dwd_cust_hold_d h join dim_product p on h.prdt_id=p.prdt_id where h.data_dt='20260331' and p.prdt_type_name='ETF' and exists (select 1 from dwd_cust_tran_d t where t.pty_id=h.pty_id and t.data_dt between '20260101' and '20260331')",
+    "source": "generalization",
+    "variant_type": "condition_scope"
+  }
+]

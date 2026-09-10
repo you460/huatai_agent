@@ -47,6 +47,25 @@ class SecurityGuardTest(unittest.TestCase):
     def test_rejects_unknown_table(self):
         self.assert_rejected("SELECT * FROM non_exist_table")
 
+    def test_rejects_dangerous_functions(self):
+        self.assert_rejected("SELECT pg_sleep(1)")
+        self.assert_rejected("SELECT pg_read_file('postgresql.conf')")
+
+    def test_rejects_unbounded_detail_query(self):
+        self.assert_rejected("SELECT pty_id FROM ads_cust_info_d")
+
+    def test_allows_limited_detail_query(self):
+        safe, error = check_sql_safety(
+            "SELECT pty_id FROM ads_cust_info_d LIMIT 10"
+        )
+        self.assertTrue(safe, msg=error)
+
+    def test_allows_complete_aggregate_without_limit(self):
+        safe, error = check_sql_safety(
+            "SELECT COUNT(*) FROM ads_cust_info_d WHERE data_dt = '20260531'"
+        )
+        self.assertTrue(safe, msg=error)
+
     def test_allows_derived_table_column(self):
         sql = (
             "SELECT SUM(x.tran_amt) FROM ("

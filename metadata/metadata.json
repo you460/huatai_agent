@@ -7,7 +7,27 @@
     "default_biz_date": "资产、持仓、交易类表默认常用截止日期为'20260331'，Q1范围为'20260101'至'20260331'",
     "dictionary_rule": "所有代码类字段如需展示中文，必须关联dim_public字典表：表.代码字段 = dim_public.code 且 dim_public.code_type_id = '对应类型ID'",
     "sql_limit": "仅允许执行SELECT查询，禁止DROP、DELETE、UPDATE等修改数据的操作",
-    "null_handle": "数值字段为空时用coalesce(字段名, 0)处理为0"
+    "null_handle": "数值字段为空时用coalesce(字段名, 0)处理为0",
+    "product_name_grouping": "按每个产品、各产品或产品名称汇总时，最终展示粒度是dim_product.prdt_name；必须先关联产品表再按prdt_name聚合，同名产品合并，不能先按prdt_id聚合后再展示名称",
+    "branch_grouping": "营业部统计的最终维度必须是dim_branch.up_org_name与dim_branch.org_name，并直接按这两个展示字段分组；不能先按org_id聚合后再关联名称",
+    "stock_category": "题目单独说股票时使用一级分类up_prdt_type_name='股票'；只有明确说A股、ETF等具体子类时才使用prdt_type_name",
+    "no_positive_asset": "季末没有正资产、无正资产或不存在正资产，表示不存在该客户季末总资产大于0的记录，应使用NOT EXISTS检查；既包括资产为0，也包括没有季末资产记录",
+    "ratio_projection": "题目只要求占比、比率或渗透率时，只返回题目要求的维度列和比率列，不返回分子、分母或计数中间列；出现各、每个、排名或比较等分组场景时，题目未指定顺序也默认按比率降序。某分组不存在目标客户时分子必须为0而不是NULL，优先使用条件聚合，或对左连接后的分子写COALESCE(分子,0)",
+    "average_asset_population": "平均总资产的母体按题型确定：各省份、各营业部、每个分公司等分组比较以客户快照为完整母体，LEFT JOIN指定日期资产，无资产记录按0纳入平均；只查询某个有专名的单一省份、分公司或营业部时，必须从指定日期资产记录出发使用INNER JOIN，不得把无资产记录按0纳入。题目明确说明全部客户、仅有资产客户或无记录按0时，以题目说明为准",
+    "independent_conditions": "持有某类产品且某期间有交易是两个独立条件：持有条件限定产品类别，交易条件默认是任意产品交易；只有题目明确说该类产品交易时才给交易记录增加相同产品类别限制",
+    "snapshot_join_dates": "客户、资产、持仓、交易等表使用各自指定的快照或期间条件；禁止用客户表.data_dt=业务表.data_dt关联，因为客户快照日期与业务日期通常不同。日期条件分别写在各表过滤条件或对应JOIN条件中",
+    "distribution_projection": "题目问某维度的资产、金额或市值分布时，默认只返回维度列和对应汇总指标；只有题目明确要求客户数、人数或数量时才额外返回COUNT",
+    "computed_column_alias": "所有计算表达式必须提供能体现业务语义的显式别名，尤其是差值、占比、平均值、总额和数量；禁止让数据库返回?column?、sum或round等默认列名",
+    "product_category_output": "题目问某些客户持有的产品属于哪些大类或分类时，最终结果返回一级分类up_prdt_type_name、二级分类prdt_type_name和题目要求的汇总指标，并按这两个展示字段分组",
+    "explicit_product_category_level": "题目明确说产品一级分类时，只以up_prdt_type_name作为分类维度；明确说产品二级分类时，只以prdt_type_name作为分类维度。除非题目同时要求两级分类，否则不得额外返回另一层分类字段",
+    "product_penetration_population": "按产品分类计算客户渗透率时，分类范围来自指定快照实际存在的持仓记录：从dwd_cust_hold_d出发INNER JOIN dim_product后分组。除非题目明确要求展示全部分类或零持仓分类，否则不能从dim_product出发LEFT JOIN持仓而补出零渗透率分类",
+    "average_holding_population": "平均持仓市值需要把无持仓客户按0纳入时，必须保持一名客户一行：先按dwd_cust_hold_d.pty_id汇总持仓，再LEFT JOIN客户；也可关联后按客户表的pty_id分组。禁止按LEFT JOIN右表的h.pty_id分组，因为所有无持仓客户的NULL会合并成一行",
+    "inclusive_age_wording": "中文年龄条件中，X岁以上、X岁及以上、年龄在X岁以上均包含X岁，必须使用cust_age>=X；只有大于X岁、超过X岁才使用cust_age>X。X岁以下或及以下同理包含X岁",
+    "customer_ranking_column_order": "客户Top N、前N或排名题如果还要求客户属性，最终字段顺序固定为pty_id、排名指标、题目要求的附加属性；排名指标必须紧跟客户号，不能放到最后",
+    "customer_region_distribution": "满足条件客户的省份、城市或地域分布默认表示按地域统计客户数量，应返回地域维度和COUNT(DISTINCT pty_id)；如果条件包含客户累计金额阈值，必须先在子查询按pty_id聚合并HAVING筛选合格客户，再关联客户表按地域COUNT，不能按地域聚合后才HAVING。只有题目明确要求金额、资产或市值的地域分布时才汇总对应金额",
+    "difference_only_projection": "题目只问两个群体或两个指标的差值时，最终SELECT只能返回差值一列；两侧原始值可在CTE中计算，但不能作为额外输出列",
+    "branch_join_key": "交易表没有branch_no或营业部字段；营业部统计必须先用dwd_cust_tran_d.pty_id关联ads_cust_info_d.pty_id，再用ads_cust_info_d.org_id关联dim_branch.org_id",
+    "ratio_query_optimisation": "持仓市值与总资产比较、占比阈值等查询，应先分别按pty_id聚合持仓和资产，再关联两个小结果集并筛选，禁止先将持仓明细与资产明细直接连接后聚合，以免行数膨胀和超时"
   },
   "dictionary_types": [
     {

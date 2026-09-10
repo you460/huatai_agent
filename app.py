@@ -1,52 +1,36 @@
 import gradio as gr
 import pandas as pd
-from main import run_agent, execute_sql
+from main import AgentResult, run_agent
 
-# 全局变量：保存查询历史记录
-history = []
-
-def answer(question):
+def answer(question, history):
     """输入问题，返回生成的SQL、查询结果表格、历史记录"""
-    global history
+    history = list(history or [])
     
     if not question.strip():
-        return "请输入问题", pd.DataFrame(), _format_history()
+        return "请输入问题", pd.DataFrame(), _format_history(history), history
     
     # 1. 调用Agent生成SQL
-    sql = run_agent(question)
+    agent_result = run_agent(question, return_result=True)
     
-    if not sql:
-        return "生成SQL失败，请重试", pd.DataFrame(), _format_history()
+    if not isinstance(agent_result, AgentResult):
+        reason = getattr(agent_result, "message", None) or "Agent 未返回可用结果"
+        return f"生成SQL失败：{reason}", pd.DataFrame(), _format_history(history), history
     
-    # 2. 执行SQL
-    col_names, results, error = execute_sql(sql)
-    
-    if error:
-        # 出错也记录到历史（加到末尾，正序）
-        history.append({
-            "question": question,
-            "sql": sql,
-            "result": f"执行出错: {error}",
-            "row_count": 0
-        })
-        history = history[-10:]  # 只保留最近10条，超过就删最早的
-        return sql, f"执行出错: {error}", _format_history()
-    
-    # 3. 把结果转成表格
-    df = pd.DataFrame(results, columns=col_names)
+    # Agent 已执行并验证过 SQL；界面直接复用该结果，避免第二次查询。
+    df = pd.DataFrame(agent_result.rows, columns=agent_result.columns)
     
     # 4. 记录到历史（加到末尾，正序）
     history.append({
         "question": question,
-        "sql": sql,
+        "sql": agent_result.sql,
         "result": df.to_string(max_rows=5),  # 只显示前5行
         "row_count": len(df)
     })
     history = history[-10:]  # 只保留最近10条
     
-    return sql, df, _format_history()
+    return agent_result.sql, df, _format_history(history), history
 
-def _format_history():
+def _format_history(history):
     """把历史记录格式化成文本显示（正序：最早的在上面）"""
     if not history:
         return "暂无查询记录"
@@ -73,6 +57,7 @@ EXAMPLES = [
 
 # 创建界面
 with gr.Blocks(title="智能取数Agent") as demo:
+    session_history = gr.State([])
     # 标题
     gr.Markdown("# 🔍 智能取数Agent")
     gr.Markdown("输入中文问题，自动生成SQL并查询数据")
@@ -117,8 +102,8 @@ with gr.Blocks(title="智能取数Agent") as demo:
     # 绑定主按钮
     submit_btn.click(
         fn=answer,
-        inputs=question_input,
-        outputs=[sql_output, result_output, history_output],
+        inputs=[question_input, session_history],
+        outputs=[sql_output, result_output, history_output, session_history],
         show_progress="minimal"
     )
 

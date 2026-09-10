@@ -15,6 +15,14 @@ FORBIDDEN_NODE_TYPES = {
     'TRANSACTION', 'TRUNCATE', 'UPDATE',
 }
 
+# 即使是 SELECT，以下函数也可能读取服务端文件、泄露会话信息或故意耗尽连接资源。
+FORBIDDEN_FUNCTIONS = {
+    'current_user', 'current_role', 'current_setting', 'current_database',
+    'pg_backend_pid', 'pg_cancel_backend', 'pg_terminate_backend', 'pg_sleep',
+    'pg_read_file', 'pg_read_binary_file', 'pg_ls_dir', 'pg_ls_logdir',
+    'pg_stat_file', 'dblink', 'lo_export', 'lo_import', 'set_config',
+}
+
 for table in METADATA['tables']:
     table_name = table['table_name']
     VALID_TABLES.add(table_name)
@@ -47,7 +55,16 @@ def check_sql_safety(sql):
     if forbidden_types:
         return False, f"检测到禁止的SQL操作: {', '.join(forbidden_types)}"
 
-    # 检查3：表名校验。校验过程异常时必须拒绝，避免安全检查失效后放行。
+    # 检查3：拦截有副作用、可读取服务端信息或可阻塞连接的函数。
+    try:
+        for func in parsed.find_all(sqlglot.exp.Func):
+            name = (getattr(func, 'name', '') or func.sql_name()).lower()
+            if name in FORBIDDEN_FUNCTIONS:
+                return False, f"禁止调用危险函数: {name}"
+    except Exception as e:
+        return False, f"函数安全校验失败: {str(e)[:100]}"
+
+    # 检查4：表名校验。校验过程异常时必须拒绝，避免安全检查失效后放行。
     try:
         cte_aliases = {
             cte.alias
@@ -64,7 +81,7 @@ def check_sql_safety(sql):
     except Exception as e:
         return False, f"表名安全校验失败: {str(e)[:100]}"
 
-    # 检查4：按查询作用域校验带别名的字段；未限定字段仍由数据库负责判定。
+    # 检查5：按查询作用域校验带别名的字段；未限定字段仍由数据库负责判定。
     try:
         for scope in traverse_scope(parsed):
             for column in scope.columns:
@@ -76,6 +93,20 @@ def check_sql_safety(sql):
                         return False, f"字段名不存在: {real_table}.{column.name}"
     except Exception as e:
         return False, f"字段名安全校验失败: {str(e)[:100]}"
+
+    # 检查6：明细查询必须显式限制输出行数。聚合查询的计算仍由数据库完整执行，
+    # 此处不注入 LIMIT，避免改变 COUNT/SUM/AVG 等指标的计算口径。
+    try:
+        has_limit = bool(parsed.args.get('limit'))
+        has_group = bool(parsed.args.get('group'))
+        has_aggregate = any(
+            isinstance(node, sqlglot.exp.AggFunc)
+            for node in parsed.find_all(sqlglot.exp.AggFunc)
+        )
+        if not has_limit and not has_group and not has_aggregate:
+            return False, "明细查询必须包含 LIMIT，避免一次返回过多数据"
+    except Exception as e:
+        return False, f"结果行数安全校验失败: {str(e)[:100]}"
     
     return True, None
 

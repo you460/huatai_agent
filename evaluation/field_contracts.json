@@ -1,0 +1,42 @@
+{
+  "version": "1.1",
+  "questions": {
+    "77": {
+      "fields": [
+        {"semantic": "branch_company", "aliases": ["up_org_name", "分公司", "分公司名称"]},
+        {"semantic": "customer_count", "aliases": ["cust_cnt", "客户数", "客户数量", "count", "cnt"]}
+      ],
+      "order": {"required": true, "keys": ["customer_count"], "tie_policy": "any"}
+    },
+    "100": {
+      "fields": [
+        {"semantic": "branch_company", "aliases": ["up_org_name", "分公司", "分公司名称"]},
+        {"semantic": "branch_office", "aliases": ["org_name", "营业部", "营业部名称"]},
+        {"semantic": "transaction_amount", "aliases": ["tran_tot", "total_amt", "tot_tran_amt", "交易金额", "交易额"]}
+      ],
+      "order": {"required": true, "keys": ["transaction_amount"], "tie_policy": "any"}
+    },
+    "109": {
+      "fields": [
+        {"semantic": "branch_company", "aliases": ["up_org_name", "分公司", "分公司名称"]},
+        {"semantic": "branch_office", "aliases": ["org_name", "营业部", "营业部名称"]},
+        {"semantic": "transaction_amount", "aliases": ["tot_tran_amt", "total_amt", "交易金额", "交易额"]}
+      ],
+      "order": {"required": true, "keys": ["transaction_amount"], "tie_policy": "any"}
+    },
+    "134": {
+      "fields": [
+        {"semantic": "branch_company", "aliases": ["up_org_name", "分公司", "分公司名称"]},
+        {"semantic": "diamond_ratio", "aliases": ["diamond_ratio", "钻石客户占比", "钻石卡客户占比"]}
+      ],
+      "order": {"required": true, "keys": ["diamond_ratio"], "tie_policy": "any"}
+    },
+    "143": {
+      "fields": [
+        {"semantic": "product_primary_category", "aliases": ["up_prdt_type_name", "产品一级分类", "一级分类"]},
+        {"semantic": "ratio", "aliases": ["penetration", "penetration_rate", "ratio", "客户渗透率", "渗透率"]}
+      ],
+      "order": {"required": false}
+    }
+  }
+}

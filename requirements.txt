@@ -6,3 +6,5 @@ openai==3.3.0
 sqlglot==30.17.0
 # Web 界面
 gradio==6.26.0
+# 结果表格
+pandas>=2.3,<4

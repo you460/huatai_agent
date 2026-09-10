@@ -8,6 +8,32 @@ with open(METADATA_PATH, 'r', encoding='utf-8') as f:
 
 TABLES = METADATA['tables']
 
+BUSINESS_RULE_TRIGGERS = {
+    'product_name_grouping': (r'每个产品', r'各产品', r'按产品(?:名称|名字)', r'产品.*汇总'),
+    'branch_grouping': (r'营业部.*(?:统计|汇总|排名|分布)', r'各营业部', r'每个营业部'),
+    'stock_category': (r'股票(?:交易|持仓|产品)', r'股票.*(?:金额|数量|客户)'),
+    'no_positive_asset': (r'(?:没有|无|不存在).*正资产', r'资产.*(?:不大于|<=)\s*0'),
+    'ratio_projection': (r'占比', r'比率', r'渗透率'),
+    'average_asset_population': (r'平均总资产', r'总资产.*平均', r'人均总资产'),
+    'independent_conditions': (r'持有.*且.*有交易', r'持仓.*同时.*发生交易'),
+    'snapshot_join_dates': (r'(?:客户|资产|持仓|交易).*(?:日期|快照|期间)', r'\d{4}年.*(?:客户|资产|持仓|交易)'),
+    'distribution_projection': (r'(?:资产|金额|市值)分布', r'分布.*(?:资产|金额|市值)'),
+    'computed_column_alias': (r'差值', r'占比|比率|渗透率', r'平均|总额|数量'),
+    'product_category_output': (r'属于哪些.*(?:产品)?大类', r'持有.*产品.*(?:大类|分类)'),
+    'explicit_product_category_level': (r'产品一级分类', r'产品二级分类', r'按一级分类', r'按二级分类'),
+    'product_penetration_population': (r'产品.*(?:分类)?.*渗透率', r'渗透率.*产品.*分类'),
+    'average_holding_population': (r'平均持仓(?:市值|金额)', r'持仓(?:市值|金额).*平均'),
+    'inclusive_age_wording': (r'\d+岁(?:及)?以上', r'年龄在\d+岁以上', r'\d+岁(?:及)?以下'),
+    'customer_ranking_column_order': (r'(?:客户|客户号).*(?:前\s*\d+|排名)', r'(?:前\s*\d+|排名).*客户'),
+    'customer_region_distribution': (r'客户.*(?:省份|城市|地域)分布', r'(?:省份|城市|地域).*客户.*分布'),
+    'difference_only_projection': (r'差值', r'之差|相差'),
+    'branch_join_key': (r'营业部.*(?:交易|买入|卖出|金额)', r'(?:交易|买入|卖出|金额).*营业部'),
+    'ratio_query_optimisation': (
+        r'持仓市值.*总资产.*(?:占比|比例|%)', r'持仓.*大于.*总资产',
+        r'持仓.*(?:占|比例).*总资产',
+    ),
+}
+
 # 枚举值缓存，key 是字典类型 code_type_id
 _ENUM_CACHE = None
 _ENUM_MAX_PER_FIELD = 10  # 枚举值最多内嵌几个
@@ -120,6 +146,17 @@ def get_metric(keyword):
             results.append(metric)
 
     return results
+
+
+def match_business_rules(question):
+    """按题意同义表达返回适用的通用业务规则，供提示词和测试复用。"""
+    import re
+    matched = {}
+    rules = METADATA.get('global_rules', {})
+    for rule_name, patterns in BUSINESS_RULE_TRIGGERS.items():
+        if rule_name in rules and any(re.search(pattern, question, re.IGNORECASE) for pattern in patterns):
+            matched[rule_name] = rules[rule_name]
+    return matched
 
 
 if __name__ == '__main__':

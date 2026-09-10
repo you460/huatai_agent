@@ -1,0 +1,2767 @@
+{
+  "metadata": {
+    "evaluation_rules_version": "2.6",
+    "field_contracts_version": "1.1",
+    "question_bank_sha256": "8bffede7bd9f46b825fd735cabf3977b31bb4b627aede40b79554f014ef61207",
+    "data_snapshot_id": "customer_marketing_2026Q1_20260331",
+    "model": {
+      "name": "deepseek-chat",
+      "temperature": "0",
+      "max_retries": "3",
+      "max_agent_rounds": "12"
+    },
+    "prompt_version": "main.SYSTEM_PROMPT.v9",
+    "code_version": "c73b5203ace6d158889d673e8cb527e416186c7b+dirty",
+    "code_snapshot_sha256": "43cc73edb311933251fe6dff0d6217f6c7c1f18c5b72f91dfb439b4e5c751d7b",
+    "run_started_at": "2026-09-10T14:35:02.899750+00:00",
+    "evaluation_suite": "generalization30",
+    "evaluation_suite_version": "1.0",
+    "evaluation_suite_description": "独立同义改写集：覆盖同义词、语序、条件顺序、时间、边界、粒度和业务术语变化；成绩与回归集分开报告。",
+    "run_finished_at": "2026-09-10T14:36:29.383393+00:00",
+    "duration_seconds": 86.484
+  },
+  "summary": {
+    "total": 30,
+    "scored": 30,
+    "invalid_reference": 0,
+    "success": 30,
+    "accuracy": 100.0,
+    "by_difficulty": {
+      "简单": {
+        "total": 10,
+        "success": 10
+      },
+      "中等": {
+        "total": 10,
+        "success": 10
+      },
+      "较难": {
+        "total": 10,
+        "success": 10
+      }
+    },
+    "difference_counts": {
+      "结果一致": 30
+    },
+    "value_match": 30,
+    "value_match_rate": 100.0,
+    "schema_match": 30,
+    "schema_match_rate": 100.0,
+    "overall_success": 30,
+    "overall_success_rate": 100.0,
+    "by_source": {
+      "generalization": {
+        "total": 30,
+        "value_match": 30,
+        "schema_match": 30,
+        "overall_success": 30
+      }
+    },
+    "by_variant_type": {
+      "synonym": {
+        "total": 4,
+        "value_match": 4,
+        "schema_match": 4,
+        "overall_success": 4
+      },
+      "word_order": {
+        "total": 3,
+        "value_match": 3,
+        "schema_match": 3,
+        "overall_success": 3
+      },
+      "boundary_expression": {
+        "total": 2,
+        "value_match": 2,
+        "schema_match": 2,
+        "overall_success": 2
+      },
+      "business_term": {
+        "total": 4,
+        "value_match": 4,
+        "schema_match": 4,
+        "overall_success": 4
+      },
+      "time_expression": {
+        "total": 4,
+        "value_match": 4,
+        "schema_match": 4,
+        "overall_success": 4
+      },
+      "metric_expression": {
+        "total": 3,
+        "value_match": 3,
+        "schema_match": 3,
+        "overall_success": 3
+      },
+      "condition_reorder": {
+        "total": 4,
+        "value_match": 4,
+        "schema_match": 4,
+        "overall_success": 4
+      },
+      "ranking_expression": {
+        "total": 3,
+        "value_match": 3,
+        "schema_match": 3,
+        "overall_success": 3
+      },
+      "negative_condition": {
+        "total": 1,
+        "value_match": 1,
+        "schema_match": 1,
+        "overall_success": 1
+      },
+      "projection_expression": {
+        "total": 1,
+        "value_match": 1,
+        "schema_match": 1,
+        "overall_success": 1
+      },
+      "condition_scope": {
+        "total": 1,
+        "value_match": 1,
+        "schema_match": 1,
+        "overall_success": 1
+      }
+    },
+    "average_agent_seconds": 2.805456272761027
+  },
+  "details": [
+    {
+      "id": 1001,
+      "difficulty": "简单",
+      "source": "generalization",
+      "base_id": 1,
+      "variant_type": "synonym",
+      "question": "请统计最新客户快照中的客户总人数",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT COUNT(*) AS 客户总人数 FROM ads_cust_info_d WHERE data_dt='20260531'",
+      "standard_sql": "select count(*) as cust_cnt from ads_cust_info_d where data_dt='20260531'",
+      "field_contracts": [
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "客户总人数"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            500
+          ]
+        ],
+        "normalised_result_hash": "82678b87fb5a1381041b7a06ce96c047011758c40dddec0ff11b183842c9cc0e"
+      },
+      "standard_result": {
+        "columns": [
+          "cust_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            500
+          ]
+        ],
+        "normalised_result_hash": "82678b87fb5a1381041b7a06ce96c047011758c40dddec0ff11b183842c9cc0e"
+      },
+      "time_seconds": 2.1385624408721924
+    },
+    {
+      "id": 1002,
+      "difficulty": "简单",
+      "source": "generalization",
+      "base_id": 2,
+      "variant_type": "word_order",
+      "question": "最新客户名单里，男性一共有多少人",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT COUNT(*) AS male_cust_cnt FROM ads_cust_info_d WHERE data_dt='20260531' AND gender_cd='5000002'",
+      "standard_sql": "select count(*) as male_cnt from ads_cust_info_d where data_dt='20260531' and gender_cd='5000002'",
+      "field_contracts": [
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "male_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "male_cust_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            318
+          ]
+        ],
+        "normalised_result_hash": "8b6ddb95e9b4de94dfb45c1f6dcc785236817f4d9b304f94a4b151d0065a3c65"
+      },
+      "standard_result": {
+        "columns": [
+          "male_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            318
+          ]
+        ],
+        "normalised_result_hash": "8b6ddb95e9b4de94dfb45c1f6dcc785236817f4d9b304f94a4b151d0065a3c65"
+      },
+      "time_seconds": 2.611924171447754
+    },
+    {
+      "id": 1003,
+      "difficulty": "简单",
+      "source": "generalization",
+      "base_id": 5,
+      "variant_type": "synonym",
+      "question": "客户等级为白金卡的一共有多少人",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT COUNT(*) FROM ads_cust_info_d WHERE data_dt='20260531' AND cust_lvl_cd='1000002'",
+      "standard_sql": "select count(*) as cust_cnt from ads_cust_info_d where data_dt='20260531' and cust_lvl_cd='1000002'",
+      "field_contracts": [
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "count"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            73
+          ]
+        ],
+        "normalised_result_hash": "8b303d7783c79e7b724d41658980d89a22d12d30047bdf1f51f0fb9ca3e0edf9"
+      },
+      "standard_result": {
+        "columns": [
+          "cust_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            73
+          ]
+        ],
+        "normalised_result_hash": "8b303d7783c79e7b724d41658980d89a22d12d30047bdf1f51f0fb9ca3e0edf9"
+      },
+      "time_seconds": 2.0015506744384766
+    },
+    {
+      "id": 1004,
+      "difficulty": "简单",
+      "source": "generalization",
+      "base_id": 9,
+      "variant_type": "boundary_expression",
+      "question": "还不到30岁的客户共有几位",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT COUNT(*) FROM ads_cust_info_d WHERE data_dt='20260531' AND cust_age < 30",
+      "standard_sql": "select count(*) as cust_cnt from ads_cust_info_d where data_dt='20260531' and cust_age<30",
+      "field_contracts": [
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "count"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            0
+          ]
+        ],
+        "normalised_result_hash": "d0bca111f8628137adc4c16f123496dcdd1d590d06cb5d9acd68b39fe656fb97"
+      },
+      "standard_result": {
+        "columns": [
+          "cust_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            0
+          ]
+        ],
+        "normalised_result_hash": "d0bca111f8628137adc4c16f123496dcdd1d590d06cb5d9acd68b39fe656fb97"
+      },
+      "time_seconds": 1.6176505088806152
+    },
+    {
+      "id": 1005,
+      "difficulty": "简单",
+      "source": "generalization",
+      "base_id": 13,
+      "variant_type": "word_order",
+      "question": "客户归属省份为江苏省的有多少人",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT COUNT(*) FROM ads_cust_info_d WHERE data_dt='20260531' AND prov_name='江苏省'",
+      "standard_sql": "select count(*) as cust_cnt from ads_cust_info_d where data_dt='20260531' and prov_name='江苏省'",
+      "field_contracts": [
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "count"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            478
+          ]
+        ],
+        "normalised_result_hash": "1e3816af9d9f9f9264e243d184b41f18127abb7bfcd2450e636839633cbc41c6"
+      },
+      "standard_result": {
+        "columns": [
+          "cust_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            478
+          ]
+        ],
+        "normalised_result_hash": "1e3816af9d9f9f9264e243d184b41f18127abb7bfcd2450e636839633cbc41c6"
+      },
+      "time_seconds": 2.2237064838409424
+    },
+    {
+      "id": 1006,
+      "difficulty": "简单",
+      "source": "generalization",
+      "base_id": 20,
+      "variant_type": "business_term",
+      "question": "A股这一产品子类总共有多少只产品",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT COUNT(*) AS prdt_cnt FROM dim_product WHERE prdt_type_name='A股'",
+      "standard_sql": "select count(*) as prdt_cnt from dim_product where prdt_type_name='A股'",
+      "field_contracts": [
+        {
+          "semantic": "product_count",
+          "aliases": [
+            "prdt_cnt",
+            "产品数",
+            "产品数量",
+            "prdt_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "prdt_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            7987
+          ]
+        ],
+        "normalised_result_hash": "6361cf827cf403a3f7870e1b71f0f7170a3f13f2bb1f922a6d4c8783a3266053"
+      },
+      "standard_result": {
+        "columns": [
+          "prdt_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            7987
+          ]
+        ],
+        "normalised_result_hash": "6361cf827cf403a3f7870e1b71f0f7170a3f13f2bb1f922a6d4c8783a3266053"
+      },
+      "time_seconds": 3.5968399047851562
+    },
+    {
+      "id": 1007,
+      "difficulty": "简单",
+      "source": "generalization",
+      "base_id": 25,
+      "variant_type": "time_expression",
+      "question": "截至2026年一季度末，全市场客户持仓市值合计是多少",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT SUM(COALESCE(mkt_val, 0)) AS total_mkt_val\nFROM dwd_cust_hold_d\nWHERE data_dt = '20260331'",
+      "standard_sql": "select coalesce(sum(mkt_val),0) as tot_mkt_val from dwd_cust_hold_d where data_dt='20260331'",
+      "field_contracts": [
+        {
+          "semantic": "market_value",
+          "aliases": [
+            "tot_mkt_val",
+            "total_mkt_val",
+            "mkt_val",
+            "market_value",
+            "tot_hold_val",
+            "持仓市值",
+            "持仓总市值",
+            "期末持仓市值",
+            "总市值",
+            "tot_mkt_val"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "total_mkt_val"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            "613877526.1720"
+          ]
+        ],
+        "normalised_result_hash": "f29a2b4ec610dec327f523f6ad707ac753231ba11b476a1ff0426d992416634d"
+      },
+      "standard_result": {
+        "columns": [
+          "tot_mkt_val"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            "613877526.1720"
+          ]
+        ],
+        "normalised_result_hash": "f29a2b4ec610dec327f523f6ad707ac753231ba11b476a1ff0426d992416634d"
+      },
+      "time_seconds": 3.8645403385162354
+    },
+    {
+      "id": 1008,
+      "difficulty": "简单",
+      "source": "generalization",
+      "base_id": 29,
+      "variant_type": "metric_expression",
+      "question": "最新快照下客户年龄的均值是多少",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT ROUND(AVG(cust_age),2) AS avg_cust_age FROM ads_cust_info_d WHERE data_dt='20260531'",
+      "standard_sql": "select round(avg(cust_age),2) as avg_age from ads_cust_info_d where data_dt='20260531'",
+      "field_contracts": [
+        {
+          "semantic": "age_average",
+          "aliases": [
+            "avg_age",
+            "平均年龄",
+            "avg_age"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "avg_cust_age"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            "60.44"
+          ]
+        ],
+        "normalised_result_hash": "bed9655f3c7d5968b560466b60b03c227c173a2992c6e4fdc6d8edcf24c8e35d"
+      },
+      "standard_result": {
+        "columns": [
+          "avg_age"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            "60.44"
+          ]
+        ],
+        "normalised_result_hash": "bed9655f3c7d5968b560466b60b03c227c173a2992c6e4fdc6d8edcf24c8e35d"
+      },
+      "time_seconds": 1.816009521484375
+    },
+    {
+      "id": 1009,
+      "difficulty": "简单",
+      "source": "generalization",
+      "base_id": 37,
+      "variant_type": "boundary_expression",
+      "question": "男性客户中年龄至少达到50岁的有多少人",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT COUNT(*) FROM ads_cust_info_d WHERE data_dt='20260531' AND gender_cd='5000002' AND cust_age>=50",
+      "standard_sql": "select count(*) as cust_cnt from ads_cust_info_d where data_dt='20260531' and cust_age>=50 and gender_cd='5000002'",
+      "field_contracts": [
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "count"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            296
+          ]
+        ],
+        "normalised_result_hash": "e140d652b4878bbe0f420af8be141fc66e8e0ebcd9b9c3bd362a8cd19a324298"
+      },
+      "standard_result": {
+        "columns": [
+          "cust_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            296
+          ]
+        ],
+        "normalised_result_hash": "e140d652b4878bbe0f420af8be141fc66e8e0ebcd9b9c3bd362a8cd19a324298"
+      },
+      "time_seconds": 2.702454090118408
+    },
+    {
+      "id": 1010,
+      "difficulty": "简单",
+      "source": "generalization",
+      "base_id": 45,
+      "variant_type": "time_expression",
+      "question": "一季度末普通账户现金资产超过10万元的客户数",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT COUNT(*) FROM dws_cust_aset_d WHERE data_dt='20260331' AND nm_bal>100000",
+      "standard_sql": "select count(*) as cust_cnt from dws_cust_aset_d where data_dt='20260331' and nm_bal>100000",
+      "field_contracts": [
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "count"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            26
+          ]
+        ],
+        "normalised_result_hash": "9cab0519f56f13acec86572516e8ebe7b99aa40011ec3171c9c8af90c08cae7a"
+      },
+      "standard_result": {
+        "columns": [
+          "cust_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            26
+          ]
+        ],
+        "normalised_result_hash": "9cab0519f56f13acec86572516e8ebe7b99aa40011ec3171c9c8af90c08cae7a"
+      },
+      "time_seconds": 2.2352044582366943
+    },
+    {
+      "id": 1011,
+      "difficulty": "中等",
+      "source": "generalization",
+      "base_id": 51,
+      "variant_type": "condition_reorder",
+      "question": "男性中学历至少为学士且年龄超过50岁的人数",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT COUNT(*) FROM ads_cust_info_d WHERE data_dt='20260531' AND gender_cd='5000002' AND edu_cd IN ('6000004','6000003','6000002') AND cust_age>50",
+      "standard_sql": "select count(*)\nfrom ads_cust_info_d a\nleft join dim_public b on a.edu_cd = b.code and b.code_type_id='600'\nleft join dim_public c on a.gender_cd = c.code and c.code_type_id='500'\nwhere a.data_dt='20260531'\nand b.describe in ('博士','硕士','学士') and c.describe in ('男')\nand a.cust_age>50",
+      "field_contracts": [
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "count"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "count"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            75
+          ]
+        ],
+        "normalised_result_hash": "7af56691e8c1c29543e5cd856ad07560fd7fb2fc860b8facd006cd0ac250d3e2"
+      },
+      "standard_result": {
+        "columns": [
+          "count"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            75
+          ]
+        ],
+        "normalised_result_hash": "7af56691e8c1c29543e5cd856ad07560fd7fb2fc860b8facd006cd0ac250d3e2"
+      },
+      "time_seconds": 2.317232847213745
+    },
+    {
+      "id": 1012,
+      "difficulty": "中等",
+      "source": "generalization",
+      "base_id": 55,
+      "variant_type": "synonym",
+      "question": "按性别分别统计客户人数",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT p.describe AS 性别, COUNT(*) AS 客户人数\nFROM ads_cust_info_d c\nJOIN dim_public p ON c.gender_cd = p.code AND p.code_type_id = '500'\nWHERE c.data_dt = '20260531'\nGROUP BY p.describe",
+      "standard_sql": "select b.describe as gender_name, count(*) as cust_cnt from ads_cust_info_d a left join dim_public b on a.gender_cd = b.code and b.code_type_id='500' where a.data_dt='20260531' group by b.describe",
+      "field_contracts": [
+        {
+          "semantic": "gender",
+          "aliases": [
+            "gender_name",
+            "gender",
+            "性别",
+            "gender_name"
+          ]
+        },
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "性别",
+          "客户人数"
+        ],
+        "row_count": 2,
+        "sample_rows": [
+          [
+            "女",
+            182
+          ],
+          [
+            "男",
+            318
+          ]
+        ],
+        "normalised_result_hash": "32c43ae68ff9c9adf74e7f22ce87d13299b66682cdb4ae98872b6cb87eadc15c"
+      },
+      "standard_result": {
+        "columns": [
+          "gender_name",
+          "cust_cnt"
+        ],
+        "row_count": 2,
+        "sample_rows": [
+          [
+            "女",
+            182
+          ],
+          [
+            "男",
+            318
+          ]
+        ],
+        "normalised_result_hash": "32c43ae68ff9c9adf74e7f22ce87d13299b66682cdb4ae98872b6cb87eadc15c"
+      },
+      "time_seconds": 2.257709503173828
+    },
+    {
+      "id": 1013,
+      "difficulty": "中等",
+      "source": "generalization",
+      "base_id": 61,
+      "variant_type": "metric_expression",
+      "question": "一季度每位客户累计成交金额是多少",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT pty_id, SUM(COALESCE(buy_amt,0)+COALESCE(sell_amt,0)) AS total_tran_amt\nFROM dwd_cust_tran_d\nWHERE data_dt BETWEEN '20260101' AND '20260331'\nGROUP BY pty_id",
+      "standard_sql": "select pty_id, sum(coalesce(buy_amt,0) + coalesce(sell_amt,0)) as tot_tran_amt from dwd_cust_tran_d where data_dt between '20260101' and '20260331' group by pty_id",
+      "field_contracts": [
+        {
+          "semantic": "customer_id",
+          "aliases": [
+            "pty_id",
+            "客户号",
+            "客户id",
+            "pty_id"
+          ]
+        },
+        {
+          "semantic": "transaction_amount",
+          "aliases": [
+            "tran_amt",
+            "tran_tot",
+            "tot_tran_amt",
+            "total_amt",
+            "total_tran_amt",
+            "total_trade_amt",
+            "交易金额",
+            "交易额",
+            "总交易金额",
+            "tot_tran_amt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "pty_id",
+          "total_tran_amt"
+        ],
+        "row_count": 385,
+        "sample_rows": [
+          [
+            "C000000000000126",
+            "13997529.1500"
+          ],
+          [
+            "C000000000000011",
+            "106236.0000"
+          ],
+          [
+            "C000000000000034",
+            "2069643.4500"
+          ],
+          [
+            "C000000000000484",
+            "172285.0000"
+          ],
+          [
+            "C000000000000407",
+            "5522621.3000"
+          ]
+        ],
+        "normalised_result_hash": "d9ca95e0566fb0ebfb12540f897e32e29e38763c9ca6fd0d038287f299175f5b"
+      },
+      "standard_result": {
+        "columns": [
+          "pty_id",
+          "tot_tran_amt"
+        ],
+        "row_count": 385,
+        "sample_rows": [
+          [
+            "C000000000000126",
+            "13997529.1500"
+          ],
+          [
+            "C000000000000011",
+            "106236.0000"
+          ],
+          [
+            "C000000000000034",
+            "2069643.4500"
+          ],
+          [
+            "C000000000000484",
+            "172285.0000"
+          ],
+          [
+            "C000000000000407",
+            "5522621.3000"
+          ]
+        ],
+        "normalised_result_hash": "d9ca95e0566fb0ebfb12540f897e32e29e38763c9ca6fd0d038287f299175f5b"
+      },
+      "time_seconds": 3.1876699924468994
+    },
+    {
+      "id": 1014,
+      "difficulty": "中等",
+      "source": "generalization",
+      "base_id": 67,
+      "variant_type": "word_order",
+      "question": "每个分公司下设多少个营业部",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT up_org_name, COUNT(DISTINCT org_id) AS branch_cnt FROM dim_branch GROUP BY up_org_name",
+      "standard_sql": "select up_org_name, count(distinct org_id) as branch_cnt from dim_branch group by up_org_name order by branch_cnt desc",
+      "field_contracts": [
+        {
+          "semantic": "branch_company",
+          "aliases": [
+            "up_org_name",
+            "分公司",
+            "分公司名称",
+            "up_org_name"
+          ]
+        },
+        {
+          "semantic": "generic_count",
+          "aliases": [
+            "count",
+            "cnt",
+            "branch_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "up_org_name",
+          "branch_cnt"
+        ],
+        "row_count": 27,
+        "sample_rows": [
+          [
+            "安徽分公司",
+            6
+          ],
+          [
+            "北京分公司",
+            14
+          ],
+          [
+            "财富管理部",
+            26
+          ],
+          [
+            "常州分公司",
+            12
+          ],
+          [
+            "福建分公司",
+            5
+          ]
+        ],
+        "normalised_result_hash": "8221de526dbc06d18a3045eac9cafcb5478c0ba95d185ec7419c7935ef0eeb96"
+      },
+      "standard_result": {
+        "columns": [
+          "up_org_name",
+          "branch_cnt"
+        ],
+        "row_count": 27,
+        "sample_rows": [
+          [
+            "湖北分公司",
+            29
+          ],
+          [
+            "财富管理部",
+            26
+          ],
+          [
+            "南京分公司",
+            21
+          ],
+          [
+            "上海分公司",
+            17
+          ],
+          [
+            "深圳分公司",
+            17
+          ]
+        ],
+        "normalised_result_hash": "8221de526dbc06d18a3045eac9cafcb5478c0ba95d185ec7419c7935ef0eeb96"
+      },
+      "time_seconds": 2.1045706272125244
+    },
+    {
+      "id": 1015,
+      "difficulty": "中等",
+      "source": "generalization",
+      "base_id": 72,
+      "variant_type": "business_term",
+      "question": "分别汇总普通系统来源和信用系统来源在一季度的成交额",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT sys_source, SUM(COALESCE(buy_amt,0)+COALESCE(sell_amt,0)) AS total_tran_amt\nFROM dwd_cust_tran_d\nWHERE data_dt BETWEEN '20260101' AND '20260331'\nGROUP BY sys_source",
+      "standard_sql": "select sys_source, sum(coalesce(buy_amt,0)+coalesce(sell_amt,0)) as tot_tran_amt from dwd_cust_tran_d where data_dt between '20260101' and '20260331' group by sys_source",
+      "field_contracts": [
+        {
+          "semantic": "account_source",
+          "aliases": [
+            "sys_source",
+            "sys_source_name",
+            "account_type",
+            "account_source",
+            "账户类型",
+            "账户来源",
+            "sys_source"
+          ]
+        },
+        {
+          "semantic": "transaction_amount",
+          "aliases": [
+            "tran_amt",
+            "tran_tot",
+            "tot_tran_amt",
+            "total_amt",
+            "total_tran_amt",
+            "total_trade_amt",
+            "交易金额",
+            "交易额",
+            "总交易金额",
+            "tot_tran_amt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "sys_source",
+          "total_tran_amt"
+        ],
+        "row_count": 2,
+        "sample_rows": [
+          [
+            "nm",
+            "5409011318.5124"
+          ],
+          [
+            "fc",
+            "681481080.9240"
+          ]
+        ],
+        "normalised_result_hash": "1bbc258113e3166e80ab2ab9163f7afd3b775f7833165216b32b9268e94b98a4"
+      },
+      "standard_result": {
+        "columns": [
+          "sys_source",
+          "tot_tran_amt"
+        ],
+        "row_count": 2,
+        "sample_rows": [
+          [
+            "nm",
+            "5409011318.5124"
+          ],
+          [
+            "fc",
+            "681481080.9240"
+          ]
+        ],
+        "normalised_result_hash": "1bbc258113e3166e80ab2ab9163f7afd3b775f7833165216b32b9268e94b98a4"
+      },
+      "time_seconds": 2.7252347469329834
+    },
+    {
+      "id": 1016,
+      "difficulty": "中等",
+      "source": "generalization",
+      "base_id": 77,
+      "variant_type": "ranking_expression",
+      "question": "各分公司客户人数由高到低排列",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT b.up_org_name, COUNT(*) AS cust_cnt\nFROM ads_cust_info_d a\nJOIN dim_branch b ON a.org_id = b.org_id\nWHERE a.data_dt = '20260531'\nGROUP BY b.up_org_name\nORDER BY cust_cnt DESC",
+      "standard_sql": "select b.up_org_name, count(distinct a.pty_id) as cust_cnt from ads_cust_info_d a join dim_branch b on a.org_id=b.org_id where a.data_dt='20260531' group by b.up_org_name order by cust_cnt desc",
+      "field_contracts": [
+        {
+          "semantic": "branch_company",
+          "aliases": [
+            "up_org_name",
+            "分公司",
+            "分公司名称",
+            "up_org_name"
+          ]
+        },
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "up_org_name",
+          "cust_cnt"
+        ],
+        "row_count": 10,
+        "sample_rows": [
+          [
+            "苏州分公司",
+            446
+          ],
+          [
+            "南京分公司",
+            30
+          ],
+          [
+            "上海分公司",
+            8
+          ],
+          [
+            "北京分公司",
+            5
+          ],
+          [
+            "广东分公司",
+            3
+          ]
+        ],
+        "normalised_result_hash": "a3c467aba21bd0e807a44dee605a6c413eb391aef50c2e40d580fef40ac7731f"
+      },
+      "standard_result": {
+        "columns": [
+          "up_org_name",
+          "cust_cnt"
+        ],
+        "row_count": 10,
+        "sample_rows": [
+          [
+            "苏州分公司",
+            446
+          ],
+          [
+            "南京分公司",
+            30
+          ],
+          [
+            "上海分公司",
+            8
+          ],
+          [
+            "北京分公司",
+            5
+          ],
+          [
+            "广东分公司",
+            3
+          ]
+        ],
+        "normalised_result_hash": "a3c467aba21bd0e807a44dee605a6c413eb391aef50c2e40d580fef40ac7731f"
+      },
+      "time_seconds": 2.791820764541626
+    },
+    {
+      "id": 1017,
+      "difficulty": "中等",
+      "source": "generalization",
+      "base_id": 82,
+      "variant_type": "business_term",
+      "question": "按产品子类对一季度成交额进行排名",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT p.prdt_type_name AS 产品二级分类, SUM(COALESCE(t.buy_amt,0)+COALESCE(t.sell_amt,0)) AS 成交额\nFROM dwd_cust_tran_d t\nJOIN dim_product p ON t.prdt_id = p.prdt_id\nWHERE t.data_dt BETWEEN '20260101' AND '20260331'\nGROUP BY p.prdt_type_name\nORDER BY 成交额 DESC",
+      "standard_sql": "select p.prdt_type_name, sum(coalesce(t.buy_amt,0)+coalesce(t.sell_amt,0)) as tran_amt from dwd_cust_tran_d t join dim_product p on t.prdt_id=p.prdt_id where t.data_dt between '20260101' and '20260331' group by p.prdt_type_name order by tran_amt desc",
+      "field_contracts": [
+        {
+          "semantic": "product_secondary_category",
+          "aliases": [
+            "prdt_type_name",
+            "产品二级分类",
+            "产品二级类别",
+            "二级分类",
+            "二级类别",
+            "产品子类",
+            "prdt_type_name"
+          ]
+        },
+        {
+          "semantic": "transaction_amount",
+          "aliases": [
+            "tran_amt",
+            "tran_tot",
+            "tot_tran_amt",
+            "total_amt",
+            "total_tran_amt",
+            "total_trade_amt",
+            "交易金额",
+            "交易额",
+            "总交易金额",
+            "tran_amt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "产品二级分类",
+          "成交额"
+        ],
+        "row_count": 21,
+        "sample_rows": [
+          [
+            "A股",
+            "1560165265.0400"
+          ],
+          [
+            "天天发",
+            "1484958100.4300"
+          ],
+          [
+            "国债逆回购",
+            "1460163000.0000"
+          ],
+          [
+            "创业板",
+            "845516905.6540"
+          ],
+          [
+            "科创板",
+            "344818552.1400"
+          ]
+        ],
+        "normalised_result_hash": "9c43e757fd4521144a34331b323ee997afbb8a1d3bc4a2043477da9d4a91368c"
+      },
+      "standard_result": {
+        "columns": [
+          "prdt_type_name",
+          "tran_amt"
+        ],
+        "row_count": 21,
+        "sample_rows": [
+          [
+            "A股",
+            "1560165265.0400"
+          ],
+          [
+            "天天发",
+            "1484958100.4300"
+          ],
+          [
+            "国债逆回购",
+            "1460163000.0000"
+          ],
+          [
+            "创业板",
+            "845516905.6540"
+          ],
+          [
+            "科创板",
+            "344818552.1400"
+          ]
+        ],
+        "normalised_result_hash": "9c43e757fd4521144a34331b323ee997afbb8a1d3bc4a2043477da9d4a91368c"
+      },
+      "time_seconds": 2.4054930210113525
+    },
+    {
+      "id": 1018,
+      "difficulty": "中等",
+      "source": "generalization",
+      "base_id": 89,
+      "variant_type": "time_expression",
+      "question": "一季度末持有ETF的客户共有多少人",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT COUNT(DISTINCT h.pty_id) AS etf_holder_cnt\nFROM dwd_cust_hold_d h\nJOIN dim_product p ON h.prdt_id = p.prdt_id\nWHERE h.data_dt = '20260331' AND p.prdt_type_name = 'ETF'",
+      "standard_sql": "select count(distinct a.pty_id) as cust_cnt from dwd_cust_hold_d a join dim_product b on a.prdt_id=b.prdt_id where a.data_dt='20260331' and b.prdt_type_name='ETF'",
+      "field_contracts": [
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "etf_holder_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            48
+          ]
+        ],
+        "normalised_result_hash": "23b199acaa0340d2cf07497f3d23bc5e8bafa8c6c028759080e0958507e348d0"
+      },
+      "standard_result": {
+        "columns": [
+          "cust_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            48
+          ]
+        ],
+        "normalised_result_hash": "23b199acaa0340d2cf07497f3d23bc5e8bafa8c6c028759080e0958507e348d0"
+      },
+      "time_seconds": 4.19374418258667
+    },
+    {
+      "id": 1019,
+      "difficulty": "中等",
+      "source": "generalization",
+      "base_id": 95,
+      "variant_type": "synonym",
+      "question": "按学历层次统计男性客户人数",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT p.describe AS 学历, COUNT(*) AS 客户人数\nFROM ads_cust_info_d c\nJOIN dim_public p ON c.edu_cd = p.code AND p.code_type_id = '600'\nWHERE c.data_dt = '20260531' AND c.gender_cd = '5000002'\nGROUP BY p.describe",
+      "standard_sql": "select b.describe as edu_name, count(*) as cust_cnt from ads_cust_info_d a left join dim_public b on a.edu_cd=b.code and b.code_type_id='600' where a.data_dt='20260531' and a.gender_cd='5000002' group by b.describe order by cust_cnt desc",
+      "field_contracts": [
+        {
+          "semantic": "education",
+          "aliases": [
+            "edu_name",
+            "edu_level",
+            "education",
+            "education_level",
+            "学历",
+            "学历层级",
+            "教育程度",
+            "edu_name"
+          ]
+        },
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "学历",
+          "客户人数"
+        ],
+        "row_count": 7,
+        "sample_rows": [
+          [
+            "其他",
+            5
+          ],
+          [
+            "硕士",
+            12
+          ],
+          [
+            "初中及其以下",
+            37
+          ],
+          [
+            "高中",
+            55
+          ],
+          [
+            "学士",
+            72
+          ]
+        ],
+        "normalised_result_hash": "c2b4ed5b10cd9a178986b632c0c1752a4b3d8c78c75006a8c43436e3e9abab57"
+      },
+      "standard_result": {
+        "columns": [
+          "edu_name",
+          "cust_cnt"
+        ],
+        "row_count": 7,
+        "sample_rows": [
+          [
+            "大专",
+            115
+          ],
+          [
+            "学士",
+            72
+          ],
+          [
+            "高中",
+            55
+          ],
+          [
+            "初中及其以下",
+            37
+          ],
+          [
+            "中专",
+            22
+          ]
+        ],
+        "normalised_result_hash": "c2b4ed5b10cd9a178986b632c0c1752a4b3d8c78c75006a8c43436e3e9abab57"
+      },
+      "time_seconds": 1.998772144317627
+    },
+    {
+      "id": 1020,
+      "difficulty": "中等",
+      "source": "generalization",
+      "base_id": 100,
+      "variant_type": "ranking_expression",
+      "question": "按营业部统计客户一季度成交额并进行排名",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT b.up_org_name, b.org_name, SUM(COALESCE(t.buy_amt,0)+COALESCE(t.sell_amt,0)) AS total_tran_amt\nFROM dwd_cust_tran_d t\nJOIN ads_cust_info_d c ON t.pty_id = c.pty_id AND c.data_dt='20260531'\nJOIN dim_branch b ON c.org_id = b.org_id\nWHERE t.data_dt BETWEEN '20260101' AND '20260331'\nGROUP BY b.up_org_name, b.org_name\nORDER BY total_tran_amt DESC",
+      "standard_sql": "select c.up_org_name, c.org_name, sum(coalesce(b.buy_amt,0)+coalesce(b.sell_amt,0)) as tran_tot from ads_cust_info_d a join dwd_cust_tran_d b on a.pty_id=b.pty_id and b.data_dt between '20260101' and '20260331' join dim_branch c on a.org_id=c.org_id where a.data_dt='20260531' group by c.up_org_name, c.org_name order by tran_tot desc",
+      "field_contracts": [
+        {
+          "semantic": "branch_company",
+          "aliases": [
+            "up_org_name",
+            "分公司",
+            "分公司名称",
+            "up_org_name"
+          ]
+        },
+        {
+          "semantic": "branch_office",
+          "aliases": [
+            "org_name",
+            "营业部",
+            "营业部名称",
+            "org_name"
+          ]
+        },
+        {
+          "semantic": "transaction_amount",
+          "aliases": [
+            "tran_amt",
+            "tran_tot",
+            "tot_tran_amt",
+            "total_amt",
+            "total_tran_amt",
+            "total_trade_amt",
+            "交易金额",
+            "交易额",
+            "总交易金额",
+            "tran_tot"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "up_org_name",
+          "org_name",
+          "total_tran_amt"
+        ],
+        "row_count": 15,
+        "sample_rows": [
+          [
+            "苏州分公司",
+            "张家******营业部",
+            "5635190898.1664"
+          ],
+          [
+            "南京分公司",
+            "南京******营业部",
+            "250248153.2100"
+          ],
+          [
+            "上海分公司",
+            "上海******营业部",
+            "111312421.9200"
+          ],
+          [
+            "苏州分公司",
+            "苏州******营业部",
+            "24834127.1400"
+          ],
+          [
+            "无锡分公司",
+            "无锡******营业部",
+            "19061603.9800"
+          ]
+        ],
+        "normalised_result_hash": "0a512c92b5d8dccc94501744d4aef07f930e3bccbb47059b1d62716001872943"
+      },
+      "standard_result": {
+        "columns": [
+          "up_org_name",
+          "org_name",
+          "tran_tot"
+        ],
+        "row_count": 15,
+        "sample_rows": [
+          [
+            "苏州分公司",
+            "张家******营业部",
+            "5635190898.1664"
+          ],
+          [
+            "南京分公司",
+            "南京******营业部",
+            "250248153.2100"
+          ],
+          [
+            "上海分公司",
+            "上海******营业部",
+            "111312421.9200"
+          ],
+          [
+            "苏州分公司",
+            "苏州******营业部",
+            "24834127.1400"
+          ],
+          [
+            "无锡分公司",
+            "无锡******营业部",
+            "19061603.9800"
+          ]
+        ],
+        "normalised_result_hash": "0a512c92b5d8dccc94501744d4aef07f930e3bccbb47059b1d62716001872943"
+      },
+      "time_seconds": 2.5227625370025635
+    },
+    {
+      "id": 1021,
+      "difficulty": "较难",
+      "source": "generalization",
+      "base_id": 101,
+      "variant_type": "condition_reorder",
+      "question": "筛选年龄超过40岁的钻石卡男性、比亚迪持仓市值累计超1000元的客户，给出其2026年一季度盈亏情况明细",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "WITH target_cust AS (\n  SELECT c.pty_id\n  FROM ads_cust_info_d c\n  WHERE c.data_dt = '20260531'\n    AND c.cust_age > 40\n    AND c.gender_cd = '5000002'\n    AND c.cust_lvl_cd = '1000001'\n    AND EXISTS (\n      SELECT 1\n      FROM dwd_cust_hold_d h\n      JOIN dim_product p ON h.prdt_id = p.prdt_id\n      WHERE h.pty_id = c.pty_id\n        AND h.data_dt = '20260331'\n        AND p.prdt_name = '比亚迪'\n        AND p.prdt_type_name = 'A股'\n      GROUP BY h.pty_id\n      HAVING SUM(COALESCE(h.mkt_val, 0)) > 1000\n    )\n),\nbegin_aset AS (\n  SELECT pty_id, SUM(COALESCE(nm_tot_aset, 0) + COALESCE(fc_pur_aset, 0)) AS begin_aset\n  FROM dws_cust_aset_d\n  WHERE data_dt = '20260101'\n  GROUP BY pty_id\n),\nend_aset AS (\n  SELECT pty_id, SUM(COALESCE(nm_tot_aset, 0) + COALESCE(fc_pur_aset, 0)) AS end_aset\n  FROM dws_cust_aset_d\n  WHERE data_dt = '20260331'\n  GROUP BY pty_id\n),\nflow AS (\n  SELECT pty_id,\n         SUM(COALESCE(cash_in, 0) + COALESCE(tran_in, 0) + COALESCE(assign_in, 0)) AS cash_inflow,\n         SUM(COALESCE(cash_out, 0) + COALESCE(tran_out, 0) + COALESCE(assign_out, 0)) AS cash_outflow\n  FROM dws_cust_fin_d\n  WHERE data_dt BETWEEN '20260101' AND '20260331'\n  GROUP BY pty_id\n)\nSELECT t.pty_id,\n       COALESCE(b.begin_aset, 0) AS begin_aset,\n       COALESCE(e.end_aset, 0) AS end_aset,\n       COALESCE(f.cash_inflow, 0) AS cash_inflow,\n       COALESCE(f.cash_outflow, 0) AS cash_outflow,\n       COALESCE(e.end_aset, 0) - COALESCE(b.begin_aset, 0) + COALESCE(f.cash_outflow, 0) - COALESCE(f.cash_inflow, 0) AS profit_loss\nFROM target_cust t\nLEFT JOIN begin_aset b ON t.pty_id = b.pty_id\nLEFT JOIN end_aset e ON t.pty_id = e.pty_id\nLEFT JOIN flow f ON t.pty_id = f.pty_id",
+      "standard_sql": "with custinfo as\n(select pty_id\nfrom ads_cust_info_d a\nleft join dim_public b on a.cust_lvl_cd=b.code and b.code_type_id='100'\nleft join dim_public c on a.gender_cd=c.code and c.code_type_id='500'\nwhere a.data_dt='20260531' and b.describe='紫金理财钻石卡客户' and c.describe='男'\nand a.cust_age>40\n), prdtinfo as\n(select a.pty_id,sum(a.mkt_val) as mkt_val\nfrom dwd_cust_hold_d a\ninner join dim_product b on a.prdt_id=b.prdt_id\nwhere b.prdt_name='比亚迪' and a.data_dt='20260331'\nand exists(select 1 from custinfo z where a.pty_id=z.pty_id)\ngroup by a.pty_id\nhaving sum(a.mkt_val)>1000\n)\nselect a.pty_id\n     ,coalesce(c.nm_tot_aset,0)+coalesce(c.fc_pur_aset,0) as bgn_aset\n     ,coalesce(b.nm_tot_aset,0)+coalesce(b.fc_pur_aset,0) as end_aset\n     ,coalesce(d.aset_in,0) as aset_in\n     ,coalesce(d.aset_out,0) as aset_out\n     ,coalesce(b.nm_tot_aset,0)+coalesce(b.fc_pur_aset,0)-coalesce(c.nm_tot_aset,0)-coalesce(c.fc_pur_aset,0)+coalesce(d.aset_out,0)-coalesce(d.aset_in,0) as aset_pft\nfrom prdtinfo a\nleft join dws_cust_aset_d b on a.pty_id=b.pty_id and b.data_dt='20260331'\nleft join dws_cust_aset_d c on a.pty_id=c.pty_id and c.data_dt='20260101'\nleft join\n(\nselect pty_id\n      ,sum(cash_in)+sum(tran_in)+sum(assign_in) as aset_in\n      ,sum(cash_out)+sum(tran_out)+sum(assign_out) as aset_out\nfrom dws_cust_fin_d\nwhere data_dt between '20260101' and '20260331'\ngroup by pty_id\n) d on a.pty_id=d.pty_id",
+      "field_contracts": [
+        {
+          "semantic": "customer_id",
+          "aliases": [
+            "pty_id",
+            "客户号",
+            "客户id",
+            "pty_id"
+          ]
+        },
+        {
+          "semantic": "asset_begin",
+          "aliases": [
+            "bgn_aset",
+            "begin_aset",
+            "begin_asset",
+            "期初总资产",
+            "期初资产",
+            "bgn_aset"
+          ]
+        },
+        {
+          "semantic": "asset_end",
+          "aliases": [
+            "end_aset",
+            "end_asset",
+            "期末总资产",
+            "期末资产",
+            "end_aset"
+          ]
+        },
+        {
+          "semantic": "asset_inflow",
+          "aliases": [
+            "aset_in",
+            "inflow",
+            "资金流入",
+            "资金转入",
+            "aset_in"
+          ]
+        },
+        {
+          "semantic": "asset_outflow",
+          "aliases": [
+            "aset_out",
+            "outflow",
+            "资金流出",
+            "资金转出",
+            "aset_out"
+          ]
+        },
+        {
+          "semantic": "profit_loss",
+          "aliases": [
+            "aset_pft",
+            "profit",
+            "pft",
+            "profit_loss",
+            "pnl",
+            "盈亏",
+            "aset_pft"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "pty_id",
+          "begin_aset",
+          "end_aset",
+          "cash_inflow",
+          "cash_outflow",
+          "profit_loss"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            "C000000000000267",
+            "11620108.2090",
+            "7859068.8200",
+            "600000.0000",
+            "3700000.0000",
+            "-661039.3890"
+          ]
+        ],
+        "normalised_result_hash": "aceec1e23d2d19197d4df18038d45e1e5e06846c6601e144e886cdd117256e63"
+      },
+      "standard_result": {
+        "columns": [
+          "pty_id",
+          "bgn_aset",
+          "end_aset",
+          "aset_in",
+          "aset_out",
+          "aset_pft"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            "C000000000000267",
+            "11620108.2090",
+            "7859068.8200",
+            "600000.0000",
+            "3700000.0000",
+            "-661039.3890"
+          ]
+        ],
+        "normalised_result_hash": "aceec1e23d2d19197d4df18038d45e1e5e06846c6601e144e886cdd117256e63"
+      },
+      "time_seconds": 5.964685440063477
+    },
+    {
+      "id": 1022,
+      "difficulty": "较难",
+      "source": "generalization",
+      "base_id": 102,
+      "variant_type": "condition_reorder",
+      "question": "找出2026年一季度交易过招商银行，同时季末普通账户持有中国平安的客户",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "WITH tran_cmb AS (\n  SELECT DISTINCT t.pty_id\n  FROM dwd_cust_tran_d t\n  JOIN dim_product p ON t.prdt_id = p.prdt_id\n  WHERE t.data_dt BETWEEN '20260101' AND '20260331'\n    AND p.prdt_name = '招商银行'\n    AND p.prdt_type_name = 'A股'\n),\nhold_pa AS (\n  SELECT DISTINCT h.pty_id\n  FROM dwd_cust_hold_d h\n  JOIN dim_product p ON h.prdt_id = p.prdt_id\n  WHERE h.data_dt = '20260331'\n    AND h.sys_source = 'nm'\n    AND p.prdt_name = '中国平安'\n    AND p.prdt_type_name = 'A股'\n)\nSELECT t.pty_id\nFROM tran_cmb t\nJOIN hold_pa h ON t.pty_id = h.pty_id\nLIMIT 1000",
+      "standard_sql": "with cust_tran as\n(\nselect pty_id,prdt_id,sum(buy_amt) as buy_tot,sum(sell_amt) as sell_tot\nfrom dwd_cust_tran_d\nwhere data_dt between '20260101' and '20260331'\nand prdt_id in (\nselect prdt_id from dim_product\nwhere prdt_name='招商银行' and prdt_type_name='A股'\n)\ngroup by pty_id,prdt_id\n)\nselect a.pty_id\nfrom cust_tran a\ninner join\n(\nselect a.*\nfrom dwd_cust_hold_d a\nwhere prdt_id in (select prdt_id from dim_product where prdt_name='中国平安' and prdt_type_name='A股')\nand a.data_dt='20260331' and a.sys_source='nm'\n) b on a.pty_id=b.pty_id",
+      "field_contracts": [
+        {
+          "semantic": "customer_id",
+          "aliases": [
+            "pty_id",
+            "客户号",
+            "客户id",
+            "pty_id"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "pty_id"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            "C000000000000050"
+          ]
+        ],
+        "normalised_result_hash": "3ca45d4cbc545fc0fcb84d097993add4251738693118b08e039e6044e762d4b8"
+      },
+      "standard_result": {
+        "columns": [
+          "pty_id"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            "C000000000000050"
+          ]
+        ],
+        "normalised_result_hash": "3ca45d4cbc545fc0fcb84d097993add4251738693118b08e039e6044e762d4b8"
+      },
+      "time_seconds": 3.761964797973633
+    },
+    {
+      "id": 1023,
+      "difficulty": "较难",
+      "source": "generalization",
+      "base_id": 133,
+      "variant_type": "condition_reorder",
+      "question": "按省份统计2026年一季度创业板累计成交额超过20万元的客户人数",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "WITH cust_tran AS (\n  SELECT t.pty_id, SUM(COALESCE(t.buy_amt,0) + COALESCE(t.sell_amt,0)) AS tran_amt\n  FROM dwd_cust_tran_d t\n  JOIN dim_product p ON t.prdt_id = p.prdt_id\n  WHERE t.data_dt BETWEEN '20260101' AND '20260331'\n    AND p.prdt_type_name = '创业板'\n  GROUP BY t.pty_id\n  HAVING SUM(COALESCE(t.buy_amt,0) + COALESCE(t.sell_amt,0)) > 200000\n)\nSELECT c.prov_name, COUNT(DISTINCT c.pty_id) AS cust_cnt\nFROM cust_tran ct\nJOIN ads_cust_info_d c ON ct.pty_id = c.pty_id AND c.data_dt = '20260531'\nGROUP BY c.prov_name",
+      "standard_sql": "select c.prov_name, count(distinct t.pty_id) as cust_cnt from ads_cust_info_d c join (select a.pty_id from dwd_cust_tran_d a join dim_product b on a.prdt_id=b.prdt_id where a.data_dt between '20260101' and '20260331' and b.prdt_type_name='创业板' group by a.pty_id having sum(coalesce(a.buy_amt,0)+coalesce(a.sell_amt,0))>200000) t on c.pty_id=t.pty_id where c.data_dt='20260531' group by c.prov_name order by cust_cnt desc",
+      "field_contracts": [
+        {
+          "semantic": "province",
+          "aliases": [
+            "prov_name",
+            "省份",
+            "prov_name"
+          ]
+        },
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "prov_name",
+          "cust_cnt"
+        ],
+        "row_count": 6,
+        "sample_rows": [
+          [
+            "北京市",
+            3
+          ],
+          [
+            "广东省",
+            1
+          ],
+          [
+            "江苏省",
+            141
+          ],
+          [
+            "上海市",
+            4
+          ],
+          [
+            "四川省",
+            1
+          ]
+        ],
+        "normalised_result_hash": "b91d592df440d954312490e68afb25dcd2b9b9260101c41eb35302eb91b56303"
+      },
+      "standard_result": {
+        "columns": [
+          "prov_name",
+          "cust_cnt"
+        ],
+        "row_count": 6,
+        "sample_rows": [
+          [
+            "江苏省",
+            141
+          ],
+          [
+            "上海市",
+            4
+          ],
+          [
+            "北京市",
+            3
+          ],
+          [
+            "广东省",
+            1
+          ],
+          [
+            "四川省",
+            1
+          ]
+        ],
+        "normalised_result_hash": "b91d592df440d954312490e68afb25dcd2b9b9260101c41eb35302eb91b56303"
+      },
+      "time_seconds": 2.7799947261810303
+    },
+    {
+      "id": 1024,
+      "difficulty": "较难",
+      "source": "generalization",
+      "base_id": 104,
+      "variant_type": "time_expression",
+      "question": "统计2026年1月10日至2月15日科创板累计成交额超25万元客户的营业部分布",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "WITH kcb_cust AS (\n  SELECT t.pty_id\n  FROM dwd_cust_tran_d t\n  JOIN dim_product p ON t.prdt_id = p.prdt_id\n  WHERE t.data_dt BETWEEN '20260110' AND '20260215'\n    AND p.prdt_type_name = '科创板'\n  GROUP BY t.pty_id\n  HAVING SUM(COALESCE(t.buy_amt,0) + COALESCE(t.sell_amt,0)) > 250000\n)\nSELECT b.up_org_name, b.org_name, SUM(COALESCE(t.buy_amt,0) + COALESCE(t.sell_amt,0)) AS kcb_tran_amt\nFROM kcb_cust k\nJOIN dwd_cust_tran_d t ON t.pty_id = k.pty_id\nJOIN dim_product p ON t.prdt_id = p.prdt_id\nJOIN ads_cust_info_d c ON c.pty_id = k.pty_id AND c.data_dt = '20260531'\nJOIN dim_branch b ON c.org_id = b.org_id\nWHERE t.data_dt BETWEEN '20260110' AND '20260215'\n  AND p.prdt_type_name = '科创板'\nGROUP BY b.up_org_name, b.org_name",
+      "standard_sql": "select c.up_org_name,c.org_name,sum(b.tran_amt) as tran_amt\nfrom ads_cust_info_d a\ninner join\n(\nselect a.pty_id,sum(buy_amt)+sum(sell_amt) as tran_amt\nfrom dwd_cust_tran_d a\ninner join dim_product b on a.prdt_id=b.prdt_id and b.prdt_type_name='科创板'\nwhere a.data_dt between '20260110' and '20260215'\ngroup by a.pty_id\nhaving sum(buy_amt)+sum(sell_amt)>250000\n) b on a.pty_id=b.pty_id\nleft join dim_branch c on a.org_id=c.org_id\ngroup by c.up_org_name,c.org_name",
+      "field_contracts": [
+        {
+          "semantic": "branch_company",
+          "aliases": [
+            "up_org_name",
+            "分公司",
+            "分公司名称",
+            "up_org_name"
+          ]
+        },
+        {
+          "semantic": "branch_office",
+          "aliases": [
+            "org_name",
+            "营业部",
+            "营业部名称",
+            "org_name"
+          ]
+        },
+        {
+          "semantic": "transaction_amount",
+          "aliases": [
+            "tran_amt",
+            "tran_tot",
+            "tot_tran_amt",
+            "total_amt",
+            "total_tran_amt",
+            "total_trade_amt",
+            "交易金额",
+            "交易额",
+            "总交易金额",
+            "tran_amt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "up_org_name",
+          "org_name",
+          "kcb_tran_amt"
+        ],
+        "row_count": 3,
+        "sample_rows": [
+          [
+            "南京分公司",
+            "南京******营业部",
+            "625231.0100"
+          ],
+          [
+            "苏州分公司",
+            "张家******营业部",
+            "172005739.2700"
+          ],
+          [
+            "无锡分公司",
+            "无锡******营业部",
+            "5114499.1600"
+          ]
+        ],
+        "normalised_result_hash": "3ac0a8ae02f39cf2aa246abc124c9f55991b64509177131d28230b9ec3ac6187"
+      },
+      "standard_result": {
+        "columns": [
+          "up_org_name",
+          "org_name",
+          "tran_amt"
+        ],
+        "row_count": 3,
+        "sample_rows": [
+          [
+            "南京分公司",
+            "南京******营业部",
+            "625231.0100"
+          ],
+          [
+            "苏州分公司",
+            "张家******营业部",
+            "172005739.2700"
+          ],
+          [
+            "无锡分公司",
+            "无锡******营业部",
+            "5114499.1600"
+          ]
+        ],
+        "normalised_result_hash": "3ac0a8ae02f39cf2aa246abc124c9f55991b64509177131d28230b9ec3ac6187"
+      },
+      "time_seconds": 2.8583946228027344
+    },
+    {
+      "id": 1025,
+      "difficulty": "较难",
+      "source": "generalization",
+      "base_id": 116,
+      "variant_type": "negative_condition",
+      "question": "2026年一季度发生过资金转入、但期末不存在正资产的客户数",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT COUNT(DISTINCT f.pty_id) AS cust_cnt\nFROM dws_cust_fin_d f\nWHERE f.data_dt BETWEEN '20260101' AND '20260331'\n  AND (COALESCE(f.cash_in,0) + COALESCE(f.tran_in,0) + COALESCE(f.assign_in,0)) > 0\n  AND NOT EXISTS (\n    SELECT 1 FROM dws_cust_aset_d a\n    WHERE a.pty_id = f.pty_id\n      AND a.data_dt = '20260331'\n      AND (COALESCE(a.nm_tot_aset,0) + COALESCE(a.fc_pur_aset,0)) > 0\n  )",
+      "standard_sql": "with fin_cust as (select distinct pty_id from dws_cust_fin_d where data_dt between '20260101' and '20260331' and (cash_in > 0 or tran_in > 0 or assign_in > 0)) select count(*) as cust_cnt from fin_cust f where not exists (select 1 from dws_cust_aset_d a where a.pty_id = f.pty_id and a.data_dt='20260331' and (coalesce(a.nm_tot_aset,0)+coalesce(a.fc_pur_aset,0)) > 0)",
+      "field_contracts": [
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "cust_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            0
+          ]
+        ],
+        "normalised_result_hash": "d0bca111f8628137adc4c16f123496dcdd1d590d06cb5d9acd68b39fe656fb97"
+      },
+      "standard_result": {
+        "columns": [
+          "cust_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            0
+          ]
+        ],
+        "normalised_result_hash": "d0bca111f8628137adc4c16f123496dcdd1d590d06cb5d9acd68b39fe656fb97"
+      },
+      "time_seconds": 3.4010860919952393
+    },
+    {
+      "id": 1026,
+      "difficulty": "较难",
+      "source": "generalization",
+      "base_id": 121,
+      "variant_type": "ranking_expression",
+      "question": "客户平均总资产最高的十个营业部",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT b.up_org_name, b.org_name, AVG(COALESCE(a.nm_tot_aset,0)+COALESCE(a.fc_pur_aset,0)) AS avg_tot_aset\nFROM ads_cust_info_d c\nLEFT JOIN dws_cust_aset_d a ON c.pty_id=a.pty_id AND a.data_dt='20260331'\nJOIN dim_branch b ON c.org_id=b.org_id\nWHERE c.data_dt='20260531'\nGROUP BY b.up_org_name, b.org_name\nORDER BY avg_tot_aset DESC\nLIMIT 10",
+      "standard_sql": "select b.up_org_name, b.org_name, avg(coalesce(a.nm_tot_aset,0)+coalesce(a.fc_pur_aset,0)) as avg_tot_aset from ads_cust_info_d c left join dws_cust_aset_d a on c.pty_id = a.pty_id and a.data_dt='20260331' inner join dim_branch b on c.org_id = b.org_id where c.data_dt='20260531' group by b.up_org_name, b.org_name order by avg_tot_aset desc limit 10",
+      "field_contracts": [
+        {
+          "semantic": "branch_company",
+          "aliases": [
+            "up_org_name",
+            "分公司",
+            "分公司名称",
+            "up_org_name"
+          ]
+        },
+        {
+          "semantic": "branch_office",
+          "aliases": [
+            "org_name",
+            "营业部",
+            "营业部名称",
+            "org_name"
+          ]
+        },
+        {
+          "semantic": "asset_average",
+          "aliases": [
+            "avg_aset",
+            "平均总资产",
+            "平均资产",
+            "avg_tot_aset"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "up_org_name",
+          "org_name",
+          "avg_tot_aset"
+        ],
+        "row_count": 10,
+        "sample_rows": [
+          [
+            "无锡分公司",
+            "无锡******营业部",
+            "3320031.620000000000"
+          ],
+          [
+            "苏州分公司",
+            "张家******营业部",
+            "1391811.640850368550"
+          ],
+          [
+            "上海分公司",
+            "上海******营业部",
+            "804038.010000000000"
+          ],
+          [
+            "浙江分公司",
+            "杭州******营业部",
+            "762977.885000000000"
+          ],
+          [
+            "安徽分公司",
+            "安徽******营业部",
+            "500375.000000000000"
+          ]
+        ],
+        "normalised_result_hash": "99bac82dd977a294ebb1dc5ce666b6208a63c6aa93510e60c33f374a2da8c7ee"
+      },
+      "standard_result": {
+        "columns": [
+          "up_org_name",
+          "org_name",
+          "avg_tot_aset"
+        ],
+        "row_count": 10,
+        "sample_rows": [
+          [
+            "无锡分公司",
+            "无锡******营业部",
+            "3320031.620000000000"
+          ],
+          [
+            "苏州分公司",
+            "张家******营业部",
+            "1391811.640850368550"
+          ],
+          [
+            "上海分公司",
+            "上海******营业部",
+            "804038.010000000000"
+          ],
+          [
+            "浙江分公司",
+            "杭州******营业部",
+            "762977.885000000000"
+          ],
+          [
+            "安徽分公司",
+            "安徽******营业部",
+            "500375.000000000000"
+          ]
+        ],
+        "normalised_result_hash": "99bac82dd977a294ebb1dc5ce666b6208a63c6aa93510e60c33f374a2da8c7ee"
+      },
+      "time_seconds": 2.41400408744812
+    },
+    {
+      "id": 1027,
+      "difficulty": "较难",
+      "source": "generalization",
+      "base_id": 134,
+      "variant_type": "projection_expression",
+      "question": "按分公司给出钻石卡客户所占比例",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT b.up_org_name AS 分公司, COUNT(CASE WHEN c.cust_lvl_cd='1000001' THEN 1 END)*1.0/COUNT(*) AS 钻石卡客户占比 FROM ads_cust_info_d c JOIN dim_branch b ON c.org_id=b.org_id WHERE c.data_dt='20260531' GROUP BY b.up_org_name ORDER BY 钻石卡客户占比 DESC",
+      "standard_sql": "select b.up_org_name, count(distinct case when a.cust_lvl_cd='1000001' then a.pty_id end)*1.0/count(distinct a.pty_id) as diamond_ratio from ads_cust_info_d a join dim_branch b on a.org_id=b.org_id where a.data_dt='20260531' group by b.up_org_name order by diamond_ratio desc",
+      "field_contracts": [
+        {
+          "semantic": "branch_company",
+          "aliases": [
+            "up_org_name",
+            "分公司",
+            "分公司名称",
+            "up_org_name"
+          ]
+        },
+        {
+          "semantic": "diamond_ratio",
+          "aliases": [
+            "diamond_ratio",
+            "钻石客户占比",
+            "钻石卡客户占比",
+            "diamond_ratio"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "分公司",
+          "钻石卡客户占比"
+        ],
+        "row_count": 10,
+        "sample_rows": [
+          [
+            "苏州分公司",
+            "0.06726457399103139013"
+          ],
+          [
+            "四川分公司",
+            "0E-20"
+          ],
+          [
+            "浙江分公司",
+            "0E-20"
+          ],
+          [
+            "深圳分公司",
+            "0E-20"
+          ],
+          [
+            "安徽分公司",
+            "0E-20"
+          ]
+        ],
+        "normalised_result_hash": "9ff1020255ec4cf7671c225f49debb4d012a8cb94c5b660a282ea677c2fcde0a"
+      },
+      "standard_result": {
+        "columns": [
+          "up_org_name",
+          "diamond_ratio"
+        ],
+        "row_count": 10,
+        "sample_rows": [
+          [
+            "苏州分公司",
+            "0.06726457399103139013"
+          ],
+          [
+            "北京分公司",
+            "0E-20"
+          ],
+          [
+            "广东分公司",
+            "0E-20"
+          ],
+          [
+            "南京分公司",
+            "0E-20"
+          ],
+          [
+            "上海分公司",
+            "0E-20"
+          ]
+        ],
+        "normalised_result_hash": "9ff1020255ec4cf7671c225f49debb4d012a8cb94c5b660a282ea677c2fcde0a"
+      },
+      "time_seconds": 2.435497999191284
+    },
+    {
+      "id": 1028,
+      "difficulty": "较难",
+      "source": "generalization",
+      "base_id": 143,
+      "variant_type": "business_term",
+      "question": "以实际持仓产品一级类别统计客户覆盖率",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "WITH hold AS (\n  SELECT DISTINCT h.pty_id, p.up_prdt_type_name\n  FROM dwd_cust_hold_d h\n  INNER JOIN dim_product p ON h.prdt_id = p.prdt_id\n  WHERE h.data_dt = '20260331'\n)\nSELECT up_prdt_type_name,\n       COUNT(DISTINCT pty_id) * 1.0 / (SELECT COUNT(*) FROM ads_cust_info_d WHERE data_dt = '20260531') AS cust_coverage_rate\nFROM hold\nGROUP BY up_prdt_type_name\nORDER BY cust_coverage_rate DESC",
+      "standard_sql": "select p.up_prdt_type_name, count(distinct h.pty_id)*1.0/(select count(*) from ads_cust_info_d where data_dt='20260531') as penetration from dwd_cust_hold_d h join dim_product p on h.prdt_id=p.prdt_id where h.data_dt='20260331' group by p.up_prdt_type_name order by penetration desc",
+      "field_contracts": [
+        {
+          "semantic": "product_primary_category",
+          "aliases": [
+            "up_prdt_type_name",
+            "产品一级分类",
+            "产品一级类别",
+            "一级分类",
+            "一级类别",
+            "产品大类",
+            "up_prdt_type_name"
+          ]
+        },
+        {
+          "semantic": "ratio",
+          "aliases": [
+            "ratio",
+            "penetration",
+            "penetration_rate",
+            "占比",
+            "渗透率",
+            "penetration"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "up_prdt_type_name",
+          "cust_coverage_rate"
+        ],
+        "row_count": 6,
+        "sample_rows": [
+          [
+            "股票",
+            "0.83000000000000000000"
+          ],
+          [
+            "开放式基金",
+            "0.63200000000000000000"
+          ],
+          [
+            "债券",
+            "0.10600000000000000000"
+          ],
+          [
+            "证券投资类私募",
+            "0.01200000000000000000"
+          ],
+          [
+            "理财产品",
+            "0.00600000000000000000"
+          ]
+        ],
+        "normalised_result_hash": "7759df3c20d442b2a17cdb9bde63a3661557505d8ad0ae488b466320abdb9feb"
+      },
+      "standard_result": {
+        "columns": [
+          "up_prdt_type_name",
+          "penetration"
+        ],
+        "row_count": 6,
+        "sample_rows": [
+          [
+            "股票",
+            "0.83000000000000000000"
+          ],
+          [
+            "开放式基金",
+            "0.63200000000000000000"
+          ],
+          [
+            "债券",
+            "0.10600000000000000000"
+          ],
+          [
+            "证券投资类私募",
+            "0.01200000000000000000"
+          ],
+          [
+            "理财产品",
+            "0.00600000000000000000"
+          ]
+        ],
+        "normalised_result_hash": "7759df3c20d442b2a17cdb9bde63a3661557505d8ad0ae488b466320abdb9feb"
+      },
+      "time_seconds": 3.7753710746765137
+    },
+    {
+      "id": 1029,
+      "difficulty": "较难",
+      "source": "generalization",
+      "base_id": 145,
+      "variant_type": "metric_expression",
+      "question": "计算女性客户人均持仓市值减去男性客户人均持仓市值",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "WITH hold AS (\n  SELECT pty_id, SUM(COALESCE(mkt_val,0)) AS total_mkt_val\n  FROM dwd_cust_hold_d\n  WHERE data_dt='20260331'\n  GROUP BY pty_id\n)\nSELECT AVG(CASE WHEN c.gender_cd='5000003' THEN COALESCE(h.total_mkt_val,0) END)\n     - AVG(CASE WHEN c.gender_cd='5000002' THEN COALESCE(h.total_mkt_val,0) END) AS avg_mkt_val_diff\nFROM ads_cust_info_d c\nLEFT JOIN hold h ON c.pty_id=h.pty_id\nWHERE c.data_dt='20260531' AND c.gender_cd IN ('5000003','5000002')",
+      "standard_sql": "with hold as (select pty_id, sum(mkt_val) as hv from dwd_cust_hold_d where data_dt='20260331' group by pty_id) select avg(case when c.gender_cd='5000003' then coalesce(h.hv,0) end) - avg(case when c.gender_cd='5000002' then coalesce(h.hv,0) end) as hold_diff from ads_cust_info_d c left join hold h on c.pty_id=h.pty_id where c.data_dt='20260531'",
+      "field_contracts": [
+        {
+          "semantic": "market_value_difference",
+          "aliases": [
+            "hold_diff",
+            "持仓市值差值",
+            "hold_diff"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "avg_mkt_val_diff"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            "-656998.769305135116"
+          ]
+        ],
+        "normalised_result_hash": "87c6a18e0a799ef7868853ee3b943d0a7da88024fe462955d01c7d43028af52e"
+      },
+      "standard_result": {
+        "columns": [
+          "hold_diff"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            "-656998.769305135116"
+          ]
+        ],
+        "normalised_result_hash": "87c6a18e0a799ef7868853ee3b943d0a7da88024fe462955d01c7d43028af52e"
+      },
+      "time_seconds": 2.7528796195983887
+    },
+    {
+      "id": 1030,
+      "difficulty": "较难",
+      "source": "generalization",
+      "base_id": 150,
+      "variant_type": "condition_scope",
+      "question": "季末持有ETF且一季度发生过任意产品交易的客户数",
+      "success": true,
+      "value_match": true,
+      "schema_match": true,
+      "overall_success": true,
+      "valid_for_scoring": true,
+      "difference_type": "结果一致",
+      "difference_summary": "字段语义、结果值和题意要求的排序均一致",
+      "failure_evidence": null,
+      "comparison_evidence": {
+        "field_check": {
+          "passed": true
+        },
+        "result_check": {
+          "passed": true
+        }
+      },
+      "generated_sql": "SELECT COUNT(DISTINCT h.pty_id) AS cust_cnt\nFROM dwd_cust_hold_d h\nJOIN dim_product p ON h.prdt_id = p.prdt_id\nWHERE h.data_dt = '20260331'\n  AND p.prdt_type_name = 'ETF'\n  AND EXISTS (\n    SELECT 1 FROM dwd_cust_tran_d t\n    WHERE t.pty_id = h.pty_id\n      AND t.data_dt BETWEEN '20260101' AND '20260331'\n  )",
+      "standard_sql": "select count(distinct h.pty_id) as cust_cnt from dwd_cust_hold_d h join dim_product p on h.prdt_id=p.prdt_id where h.data_dt='20260331' and p.prdt_type_name='ETF' and exists (select 1 from dwd_cust_tran_d t where t.pty_id=h.pty_id and t.data_dt between '20260101' and '20260331')",
+      "field_contracts": [
+        {
+          "semantic": "customer_count",
+          "aliases": [
+            "cust_cnt",
+            "male_cnt",
+            "female_cnt",
+            "female_cust_cnt",
+            "male_cust_cnt",
+            "高净值客户数量",
+            "客户数",
+            "客户数量",
+            "cust_cnt"
+          ]
+        }
+      ],
+      "generated_result": {
+        "columns": [
+          "cust_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            46
+          ]
+        ],
+        "normalised_result_hash": "5c441ccce965fb3da22f42aa850da25c6c9c85fe3ff43a24aeed2cacfda4926b"
+      },
+      "standard_result": {
+        "columns": [
+          "cust_cnt"
+        ],
+        "row_count": 1,
+        "sample_rows": [
+          [
+            46
+          ]
+        ],
+        "normalised_result_hash": "5c441ccce965fb3da22f42aa850da25c6c9c85fe3ff43a24aeed2cacfda4926b"
+      },
+      "time_seconds": 2.7063567638397217
+    }
+  ]
+}
