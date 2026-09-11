@@ -14,3 +14,7 @@ env/
 # IDE
 .vscode/
 .idea/
+
+# 离线评测运行产物（需要提交指定报告时使用 git add -f）
+evaluation/eval_results_v2_*.json
+evaluation/*_stability.json
