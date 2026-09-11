@@ -1,0 +1,29 @@
+{
+  "suite": "compact90",
+  "runs": 3,
+  "metrics": {
+    "value_match_rate": {
+      "mean": 100.0,
+      "minimum": 100.0,
+      "maximum": 100.0,
+      "range": 0.0
+    },
+    "schema_match_rate": {
+      "mean": 100.0,
+      "minimum": 100.0,
+      "maximum": 100.0,
+      "range": 0.0
+    },
+    "overall_success_rate": {
+      "mean": 100.0,
+      "minimum": 100.0,
+      "maximum": 100.0,
+      "range": 0.0
+    }
+  },
+  "files": [
+    "eval_results_v2_compact90_20260911T094916178525Z.json",
+    "eval_results_v2_compact90_20260911T100908221615Z.json",
+    "eval_results_v2_compact90_20260911T101243244825Z.json"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "suite": "generalization30",
+  "runs": 3,
+  "metrics": {
+    "value_match_rate": {
+      "mean": 100.0,
+      "minimum": 100.0,
+      "maximum": 100.0,
+      "range": 0.0
+    },
+    "schema_match_rate": {
+      "mean": 100.0,
+      "minimum": 100.0,
+      "maximum": 100.0,
+      "range": 0.0
+    },
+    "overall_success_rate": {
+      "mean": 100.0,
+      "minimum": 100.0,
+      "maximum": 100.0,
+      "range": 0.0
+    }
+  },
+  "files": [
+    "eval_results_v2_generalization30_20260911T094737245218Z.json",
+    "eval_results_v2_generalization30_20260911T100605278942Z.json",
+    "eval_results_v2_generalization30_20260911T100731213414Z.json"
+  ]
+}
