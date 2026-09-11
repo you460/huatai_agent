@@ -407,11 +407,12 @@ class EvaluateCompareTest(unittest.TestCase):
         )
         for field in (
             'evaluation_rules_version', 'question_bank_sha256', 'data_snapshot_id',
-            'model', 'prompt_version', 'code_version', 'code_snapshot_sha256',
-            'run_started_at',
+            'model', 'prompt_version', 'prompt_sha256', 'code_version',
+            'code_snapshot_sha256', 'artifact_sha256', 'runtime', 'run_started_at',
         ):
             self.assertIn(field, metadata)
         self.assertEqual(len(metadata['code_snapshot_sha256']), 64)
+        self.assertEqual(len(metadata['prompt_sha256']), 64)
 
 
 if __name__ == '__main__':

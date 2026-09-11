@@ -1,0 +1,6 @@
+# 用于复现当前评测环境的直接依赖版本（Python 3.12）
+psycopg2-binary==2.9.9
+openai==3.3.0
+sqlglot==30.17.0
+gradio==6.26.0
+pandas==3.0.1

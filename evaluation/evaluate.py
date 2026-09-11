@@ -1,6 +1,8 @@
 import hashlib
+import importlib.metadata
 import json
 import os
+import platform
 import re
 import subprocess
 import sys
@@ -23,12 +25,18 @@ sys.path.insert(0, str(PROJECT_DIR))
 
 from main import execute_sql, run_agent
 
+try:
+    from main import SYSTEM_PROMPT
+except ImportError:  # 单元测试可注入只包含接口函数的最小 main 模块
+    SYSTEM_PROMPT = ''
+
 
 RULES_VERSION = '2.6'
 PROMPT_VERSION = os.getenv('EVALUATION_PROMPT_VERSION', 'main.SYSTEM_PROMPT.v9')
 SAMPLE_ROWS = 5
 CONTRACTS_PATH = EVALUATION_DIR / 'field_contracts.json'
 SUITES_PATH = EVALUATION_DIR / 'suites.json'
+SNAPSHOT_MANIFEST_PATH = EVALUATION_DIR / 'data_snapshot_manifest.json'
 
 
 def _load_contracts():
@@ -672,7 +680,8 @@ def _code_snapshot_hash():
     for relative_path in (
         'app.py', 'config.py', 'main.py', 'metadata_tools.py', 'security_guard.py',
         'evaluation/evaluate.py', 'evaluation/field_contracts.json',
-        'evaluation/suites.json', 'metadata/metadata.json',
+        'evaluation/suites.json', 'evaluation/snapshot_manifest.py',
+        'metadata/metadata.json', 'requirements.txt', 'requirements-lock.txt',
     ):
         path = PROJECT_DIR / relative_path
         digest.update(relative_path.encode('utf-8'))
@@ -680,6 +689,50 @@ def _code_snapshot_hash():
         digest.update(path.read_bytes())
         digest.update(b'\0')
     return digest.hexdigest()
+
+
+def _dependency_versions():
+    versions = {}
+    for package in ('psycopg2-binary', 'openai', 'sqlglot', 'gradio', 'pandas'):
+        try:
+            versions[package] = importlib.metadata.version(package)
+        except importlib.metadata.PackageNotFoundError:
+            versions[package] = 'not-installed'
+    return versions
+
+
+def _snapshot_manifest_hash():
+    if not SNAPSHOT_MANIFEST_PATH.exists():
+        return None
+    manifest = json.loads(SNAPSHOT_MANIFEST_PATH.read_text(encoding='utf-8'))
+    stable_content = {
+        'version': manifest.get('version'),
+        'snapshot_id': manifest.get('snapshot_id'),
+        'tables': manifest.get('tables'),
+    }
+    payload = json.dumps(
+        stable_content, ensure_ascii=False, sort_keys=True, separators=(',', ':')
+    )
+    return hashlib.sha256(payload.encode('utf-8')).hexdigest()
+
+
+def verify_data_snapshot():
+    """正式评测前验证数据库画像，避免把不同数据上的分数混为一谈。"""
+    if os.getenv('EVALUATION_VERIFY_SNAPSHOT', '1').strip().lower() in ('0', 'false', 'no'):
+        return 'disabled'
+    if not SNAPSHOT_MANIFEST_PATH.exists():
+        raise RuntimeError(
+            '缺少 evaluation/data_snapshot_manifest.json；请先运行 '
+            'python evaluation/snapshot_manifest.py --write'
+        )
+    from evaluation.snapshot_manifest import build_manifest, comparable
+    expected = json.loads(SNAPSHOT_MANIFEST_PATH.read_text(encoding='utf-8'))
+    current = build_manifest()
+    if comparable(current) != comparable(expected):
+        raise RuntimeError(
+            '数据库快照与 data_snapshot_manifest.json 不一致，评测已停止'
+        )
+    return 'verified'
 
 
 def _run_metadata(question_path, started_at=None):
@@ -698,8 +751,21 @@ def _run_metadata(question_path, started_at=None):
             'max_agent_rounds': os.getenv('AGENT_MAX_ROUNDS', '12'),
         },
         'prompt_version': PROMPT_VERSION,
+        'prompt_sha256': hashlib.sha256(SYSTEM_PROMPT.encode('utf-8')).hexdigest(),
         'code_version': _git_revision(),
         'code_snapshot_sha256': _code_snapshot_hash(),
+        'artifact_sha256': {
+            'metadata': _file_hash(PROJECT_DIR / 'metadata' / 'metadata.json'),
+            'field_contracts': _file_hash(CONTRACTS_PATH),
+            'evaluation_suites': _file_hash(SUITES_PATH),
+        },
+        'data_snapshot_manifest_sha256': _snapshot_manifest_hash(),
+        'runtime': {
+            'python': platform.python_version(),
+            'implementation': platform.python_implementation(),
+            'platform': platform.platform(),
+            'dependencies': _dependency_versions(),
+        },
         'run_started_at': started_at.isoformat(),
     }
 
@@ -845,6 +911,8 @@ def _write_replay_report(source, replay, output_path):
 
 
 def main(suite_name=None):
+    snapshot_status = verify_data_snapshot()
+    print(f'数据库快照核验: {snapshot_status}')
     suites = load_suites()
     suite_name = suite_name or os.environ.get('EVALUATION_SUITE') or suites['default_suite']
     questions, suite, question_path = load_suite_questions(suite_name)
@@ -975,6 +1043,7 @@ def main(suite_name=None):
 
 def replay_result_file(source_path):
     """不调用模型，重执既有 SQL 并按当前规则重放判定。"""
+    verify_data_snapshot()
     source_path = Path(source_path)
     with source_path.open(encoding='utf-8') as f:
         source = json.load(f)

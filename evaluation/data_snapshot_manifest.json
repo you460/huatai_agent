@@ -1,0 +1,72 @@
+{
+  "version": "1.0",
+  "snapshot_id": "customer_marketing_2026Q1_20260331",
+  "generated_at": "2026-09-11T09:29:32.686009+00:00",
+  "profile_scope": "table row counts, partition bounds and schema hashes; no row data",
+  "tables": [
+    {
+      "table": "ads_cust_info_d",
+      "row_count": 500,
+      "partition_key": "data_dt",
+      "partition_min": "20260531",
+      "partition_max": "20260531",
+      "schema_sha256": "13daf6168843a9e76f9f03cf62fe51abd8e97f581c8522d8344b31accdd5df87"
+    },
+    {
+      "table": "dim_branch",
+      "row_count": 312,
+      "partition_key": "",
+      "partition_min": null,
+      "partition_max": null,
+      "schema_sha256": "50fdda648331878ba03e52a0a4558b829b44109180099ac15c150014d824fc38"
+    },
+    {
+      "table": "dim_product",
+      "row_count": 334694,
+      "partition_key": "",
+      "partition_min": null,
+      "partition_max": null,
+      "schema_sha256": "d15b078611f24a514429e99be2275a986a6813f91b97d8ab333120802a9c0d1d"
+    },
+    {
+      "table": "dim_public",
+      "row_count": 155,
+      "partition_key": "",
+      "partition_min": null,
+      "partition_max": null,
+      "schema_sha256": "2672b452396e49e0c0a1b39b38821587523e624148aa35d181ae9d3e03b7a641"
+    },
+    {
+      "table": "dwd_cust_hold_d",
+      "row_count": 408150,
+      "partition_key": "data_dt",
+      "partition_min": "20260101",
+      "partition_max": "20260331",
+      "schema_sha256": "a6cb601760417ac43db052ba28290b0535741b542217a28ff42a63db7e360415"
+    },
+    {
+      "table": "dwd_cust_tran_d",
+      "row_count": 39060,
+      "partition_key": "data_dt",
+      "partition_min": "20260105",
+      "partition_max": "20260331",
+      "schema_sha256": "7ab1863285ab2404ae0e89620a490e439cd671271d2058f23149cfaa7f363404"
+    },
+    {
+      "table": "dws_cust_aset_d",
+      "row_count": 43684,
+      "partition_key": "data_dt",
+      "partition_min": "20260101",
+      "partition_max": "20260331",
+      "schema_sha256": "d08dfe57d2caf0a4420d852afe9caca5c73d8addfd18030f6ed23f72035cea78"
+    },
+    {
+      "table": "dws_cust_fin_d",
+      "row_count": 4892,
+      "partition_key": "data_dt",
+      "partition_min": "20260105",
+      "partition_max": "20260331",
+      "schema_sha256": "2af910930fb381c1f7e4b148a3ca92d25a7086011b8974085aea3632396e9d31"
+    }
+  ]
+}

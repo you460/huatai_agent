@@ -35,13 +35,17 @@ huatai_agent/
 │   ├── generalization_questions.json   # 30道独立改写题
 │   ├── field_contracts.json            # 字段语义与排序合同
 │   ├── suites.json                     # 固定评测集定义
+│   ├── data_snapshot_manifest.json      # 数据快照行数、分区和结构清单
+│   ├── snapshot_manifest.py             # 生成或核验数据库快照
+│   ├── summarize_runs.py                # 汇总多次评测的均值与波动
 │   ├── build_questions.py              # 原题库构建工具
 │   ├── build_generalization_questions.py # 泛化题构建工具
 │   ├── eval_results_v2_official7_<timestamp>.json
 │   ├── eval_results_v2_generalization30_<timestamp>.json
 │   └── eval_results_v2_compact90_<timestamp>.json
 ├── tests/                # 单元与回归测试
-├── requirements.txt     # 依赖
+├── requirements.txt     # 兼容依赖范围
+├── requirements-lock.txt # 当前正式评测的直接依赖精确版本
 └── .env.example         # 配置模板
 ```
 
@@ -49,6 +53,8 @@ huatai_agent/
 
 - Python 3.10+
 - PostgreSQL（已建库并导入数据，库名默认 `huatai`）
+
+当前正式评测使用 Python 3.12。`requirements.txt` 适合日常安装；需要尽量贴近当前评测环境时，使用记录了直接依赖精确版本的 `requirements-lock.txt`。
 
 数据集共 8 张表：
 
@@ -67,6 +73,12 @@ huatai_agent/
 
 ```bash
 pip install -r requirements.txt
+```
+
+复现当前评测环境：
+
+```bash
+pip install -r requirements-lock.txt
 ```
 
 ## 配置
@@ -130,6 +142,34 @@ python evaluation/evaluate.py --suite full150
 这90题属于内部回归基准。7道 `source=official` 的题目来自官方Q&A示例，只能说明对公开样例的兼容性，不能代表官方隐藏测试成绩。`generalization30`复用基础题的基准SQL，但改写自然语言表达，并按改写类型单独统计；它用于观察表达泛化，不能替代官方隐藏测试。泛化题一旦开始用于调整提示词，就应冻结并另建新的留出集。
 
 字段语义合同保存在 `evaluation/field_contracts.json`。可为指定题号配置预期语义、允许别名和排序规则；未显式配置的题目会从基准 SQL 返回列生成默认合同。排名题默认允许同一主排序值的行互换顺序；若业务要求固定并列顺序，需要在合同中设为 `fixed`，并让两侧 SQL 都声明二级 `ORDER BY`。
+
+## 复现评测
+
+评测前先确认数据库与项目记录的快照一致：
+
+```bash
+python evaluation/snapshot_manifest.py --verify
+```
+
+`evaluation/evaluate.py` 默认也会在调用模型前自动执行同一核验；若数据库不一致，评测会直接停止。`EVALUATION_VERIFY_SNAPSHOT=0` 只应用于明确知道数据差异的本地调试，不能用于可比较的正式成绩。
+
+首次在受控环境建立快照清单时使用 `--write`。该清单只保存8张表的行数、分区边界和数据库实际字段结构哈希，不保存客户明细：
+
+```bash
+python evaluation/snapshot_manifest.py --write
+```
+
+每份新版报告会记录 Python和操作系统版本、直接依赖版本、模型参数、提示词版本及哈希、题库与关键元数据哈希、Git状态、核心代码快照哈希和数据库快照清单哈希。API Key只用于鉴权，不写入报告。
+
+大模型即使在温度为0时也可能有轻微波动。正式报告建议在代码、数据和配置完全相同时连续运行3次，再汇总同一套评测结果：
+
+```bash
+python evaluation/summarize_runs.py evaluation/eval_results_v2_compact90_<运行1>.json evaluation/eval_results_v2_compact90_<运行2>.json evaluation/eval_results_v2_compact90_<运行3>.json --output evaluation/compact90_stability.json
+```
+
+汇总工具只接受题库、数据快照、提示词、代码和判分规则完全一致的报告，并输出 `value_match`、`schema_match`、`overall_success` 的平均值、最低值、最高值和波动范围。公开成绩时应同时报告运行次数、平均准确率和最低准确率。
+
+快照清单能发现表行数、日期范围或数据库结构变化，但不是逐行业务数据全文哈希。若官方同时提供原始数据文件，还应在提交说明中记录官方文件自身的 SHA-256；项目不复制或重新发布无授权的数据文件。
 
 ## 安全说明
 
