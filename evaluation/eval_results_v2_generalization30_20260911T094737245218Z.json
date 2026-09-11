@@ -11,14 +11,33 @@
       "max_agent_rounds": "12"
     },
     "prompt_version": "main.SYSTEM_PROMPT.v9",
-    "code_version": "c73b5203ace6d158889d673e8cb527e416186c7b+dirty",
-    "code_snapshot_sha256": "43cc73edb311933251fe6dff0d6217f6c7c1f18c5b72f91dfb439b4e5c751d7b",
-    "run_started_at": "2026-09-10T14:35:02.899750+00:00",
+    "prompt_sha256": "811c0fe85a3d8d87b5e652052721cee2431cc2f612c3110e7642b69692508aef",
+    "code_version": "044bd8ff7c434782227bc28c0727b2e35a45b34a",
+    "code_snapshot_sha256": "29d43bdc5efef4e59b1e6dd2a7a35d7f3265aa76fe9bb002200746f0f24a3979",
+    "artifact_sha256": {
+      "metadata": "e39c21a9032ccba0bf2e5e1f1a9fb604b21a13cd360bc17ae4450d773992a3fc",
+      "field_contracts": "bccc856c6498ba160b70aeb86bb40c47eaf7f5f47bb42b92d4861b0a28a3687a",
+      "evaluation_suites": "0f7d7c68529667b48e36b7f149655f4549ae5b942faef31b492921f63bfdd1af"
+    },
+    "data_snapshot_manifest_sha256": "51d258869b180df3a7274994e6625449d24b5cd0206b81212541fb0dc7c3f5f0",
+    "runtime": {
+      "python": "3.12.14",
+      "implementation": "CPython",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "dependencies": {
+        "psycopg2-binary": "2.9.9",
+        "openai": "3.3.0",
+        "sqlglot": "30.17.0",
+        "gradio": "6.26.0",
+        "pandas": "3.0.1"
+      }
+    },
+    "run_started_at": "2026-09-11T09:47:37.245218+00:00",
     "evaluation_suite": "generalization30",
     "evaluation_suite_version": "1.0",
     "evaluation_suite_description": "独立同义改写集：覆盖同义词、语序、条件顺序、时间、边界、粒度和业务术语变化；成绩与回归集分开报告。",
-    "run_finished_at": "2026-09-10T14:36:29.383393+00:00",
-    "duration_seconds": 86.484
+    "run_finished_at": "2026-09-11T09:48:53.724963+00:00",
+    "duration_seconds": 76.48
   },
   "summary": {
     "total": 30,
@@ -125,7 +144,7 @@
         "overall_success": 1
       }
     },
-    "average_agent_seconds": 2.805456272761027
+    "average_agent_seconds": 2.4721917629241945
   },
   "details": [
     {
@@ -193,7 +212,7 @@
         ],
         "normalised_result_hash": "82678b87fb5a1381041b7a06ce96c047011758c40dddec0ff11b183842c9cc0e"
       },
-      "time_seconds": 2.1385624408721924
+      "time_seconds": 1.2425684928894043
     },
     {
       "id": 1002,
@@ -260,7 +279,7 @@
         ],
         "normalised_result_hash": "8b6ddb95e9b4de94dfb45c1f6dcc785236817f4d9b304f94a4b151d0065a3c65"
       },
-      "time_seconds": 2.611924171447754
+      "time_seconds": 3.2008168697357178
     },
     {
       "id": 1003,
@@ -327,7 +346,7 @@
         ],
         "normalised_result_hash": "8b303d7783c79e7b724d41658980d89a22d12d30047bdf1f51f0fb9ca3e0edf9"
       },
-      "time_seconds": 2.0015506744384766
+      "time_seconds": 1.88197660446167
     },
     {
       "id": 1004,
@@ -352,7 +371,7 @@
           "passed": true
         }
       },
-      "generated_sql": "SELECT COUNT(*) FROM ads_cust_info_d WHERE data_dt='20260531' AND cust_age < 30",
+      "generated_sql": "SELECT COUNT(*) AS cust_cnt FROM ads_cust_info_d WHERE data_dt='20260531' AND cust_age < 30",
       "standard_sql": "select count(*) as cust_cnt from ads_cust_info_d where data_dt='20260531' and cust_age<30",
       "field_contracts": [
         {
@@ -372,7 +391,7 @@
       ],
       "generated_result": {
         "columns": [
-          "count"
+          "cust_cnt"
         ],
         "row_count": 1,
         "sample_rows": [
@@ -394,7 +413,7 @@
         ],
         "normalised_result_hash": "d0bca111f8628137adc4c16f123496dcdd1d590d06cb5d9acd68b39fe656fb97"
       },
-      "time_seconds": 1.6176505088806152
+      "time_seconds": 1.6086146831512451
     },
     {
       "id": 1005,
@@ -461,7 +480,7 @@
         ],
         "normalised_result_hash": "1e3816af9d9f9f9264e243d184b41f18127abb7bfcd2450e636839633cbc41c6"
       },
-      "time_seconds": 2.2237064838409424
+      "time_seconds": 1.7197601795196533
     },
     {
       "id": 1006,
@@ -523,7 +542,7 @@
         ],
         "normalised_result_hash": "6361cf827cf403a3f7870e1b71f0f7170a3f13f2bb1f922a6d4c8783a3266053"
       },
-      "time_seconds": 3.5968399047851562
+      "time_seconds": 2.0299863815307617
     },
     {
       "id": 1007,
@@ -548,7 +567,7 @@
           "passed": true
         }
       },
-      "generated_sql": "SELECT SUM(COALESCE(mkt_val, 0)) AS total_mkt_val\nFROM dwd_cust_hold_d\nWHERE data_dt = '20260331'",
+      "generated_sql": "SELECT SUM(COALESCE(mkt_val, 0)) AS 持仓市值合计 FROM dwd_cust_hold_d WHERE data_dt = '20260331'",
       "standard_sql": "select coalesce(sum(mkt_val),0) as tot_mkt_val from dwd_cust_hold_d where data_dt='20260331'",
       "field_contracts": [
         {
@@ -569,7 +588,7 @@
       ],
       "generated_result": {
         "columns": [
-          "total_mkt_val"
+          "持仓市值合计"
         ],
         "row_count": 1,
         "sample_rows": [
@@ -591,7 +610,7 @@
         ],
         "normalised_result_hash": "f29a2b4ec610dec327f523f6ad707ac753231ba11b476a1ff0426d992416634d"
       },
-      "time_seconds": 3.8645403385162354
+      "time_seconds": 1.935190200805664
     },
     {
       "id": 1008,
@@ -652,7 +671,7 @@
         ],
         "normalised_result_hash": "bed9655f3c7d5968b560466b60b03c227c173a2992c6e4fdc6d8edcf24c8e35d"
       },
-      "time_seconds": 1.816009521484375
+      "time_seconds": 2.3547208309173584
     },
     {
       "id": 1009,
@@ -719,7 +738,7 @@
         ],
         "normalised_result_hash": "e140d652b4878bbe0f420af8be141fc66e8e0ebcd9b9c3bd362a8cd19a324298"
       },
-      "time_seconds": 2.702454090118408
+      "time_seconds": 2.0099573135375977
     },
     {
       "id": 1010,
@@ -786,7 +805,7 @@
         ],
         "normalised_result_hash": "9cab0519f56f13acec86572516e8ebe7b99aa40011ec3171c9c8af90c08cae7a"
       },
-      "time_seconds": 2.2352044582366943
+      "time_seconds": 3.140021800994873
     },
     {
       "id": 1011,
@@ -853,7 +872,7 @@
         ],
         "normalised_result_hash": "7af56691e8c1c29543e5cd856ad07560fd7fb2fc860b8facd006cd0ac250d3e2"
       },
-      "time_seconds": 2.317232847213745
+      "time_seconds": 1.8763494491577148
     },
     {
       "id": 1012,
@@ -941,7 +960,7 @@
         ],
         "normalised_result_hash": "32c43ae68ff9c9adf74e7f22ce87d13299b66682cdb4ae98872b6cb87eadc15c"
       },
-      "time_seconds": 2.257709503173828
+      "time_seconds": 1.8918137550354004
     },
     {
       "id": 1013,
@@ -1054,7 +1073,7 @@
         ],
         "normalised_result_hash": "d9ca95e0566fb0ebfb12540f897e32e29e38763c9ca6fd0d038287f299175f5b"
       },
-      "time_seconds": 3.1876699924468994
+      "time_seconds": 1.8181729316711426
     },
     {
       "id": 1014,
@@ -1160,7 +1179,7 @@
         ],
         "normalised_result_hash": "8221de526dbc06d18a3045eac9cafcb5478c0ba95d185ec7419c7935ef0eeb96"
       },
-      "time_seconds": 2.1045706272125244
+      "time_seconds": 1.8502557277679443
     },
     {
       "id": 1015,
@@ -1185,7 +1204,7 @@
           "passed": true
         }
       },
-      "generated_sql": "SELECT sys_source, SUM(COALESCE(buy_amt,0)+COALESCE(sell_amt,0)) AS total_tran_amt\nFROM dwd_cust_tran_d\nWHERE data_dt BETWEEN '20260101' AND '20260331'\nGROUP BY sys_source",
+      "generated_sql": "SELECT sys_source, SUM(COALESCE(buy_amt,0)+COALESCE(sell_amt,0)) AS 成交额 FROM dwd_cust_tran_d WHERE data_dt BETWEEN '20260101' AND '20260331' GROUP BY sys_source",
       "standard_sql": "select sys_source, sum(coalesce(buy_amt,0)+coalesce(sell_amt,0)) as tot_tran_amt from dwd_cust_tran_d where data_dt between '20260101' and '20260331' group by sys_source",
       "field_contracts": [
         {
@@ -1219,7 +1238,7 @@
       "generated_result": {
         "columns": [
           "sys_source",
-          "total_tran_amt"
+          "成交额"
         ],
         "row_count": 2,
         "sample_rows": [
@@ -1252,7 +1271,7 @@
         ],
         "normalised_result_hash": "1bbc258113e3166e80ab2ab9163f7afd3b775f7833165216b32b9268e94b98a4"
       },
-      "time_seconds": 2.7252347469329834
+      "time_seconds": 1.8121137619018555
     },
     {
       "id": 1016,
@@ -1277,7 +1296,7 @@
           "passed": true
         }
       },
-      "generated_sql": "SELECT b.up_org_name, COUNT(*) AS cust_cnt\nFROM ads_cust_info_d a\nJOIN dim_branch b ON a.org_id = b.org_id\nWHERE a.data_dt = '20260531'\nGROUP BY b.up_org_name\nORDER BY cust_cnt DESC",
+      "generated_sql": "SELECT b.up_org_name, COUNT(*) AS cust_cnt\nFROM ads_cust_info_d c\nJOIN dim_branch b ON c.org_id = b.org_id\nWHERE c.data_dt = '20260531'\nGROUP BY b.up_org_name\nORDER BY cust_cnt DESC",
       "standard_sql": "select b.up_org_name, count(distinct a.pty_id) as cust_cnt from ads_cust_info_d a join dim_branch b on a.org_id=b.org_id where a.data_dt='20260531' group by b.up_org_name order by cust_cnt desc",
       "field_contracts": [
         {
@@ -1364,7 +1383,7 @@
         ],
         "normalised_result_hash": "a3c467aba21bd0e807a44dee605a6c413eb391aef50c2e40d580fef40ac7731f"
       },
-      "time_seconds": 2.791820764541626
+      "time_seconds": 1.9887521266937256
     },
     {
       "id": 1017,
@@ -1389,7 +1408,7 @@
           "passed": true
         }
       },
-      "generated_sql": "SELECT p.prdt_type_name AS 产品二级分类, SUM(COALESCE(t.buy_amt,0)+COALESCE(t.sell_amt,0)) AS 成交额\nFROM dwd_cust_tran_d t\nJOIN dim_product p ON t.prdt_id = p.prdt_id\nWHERE t.data_dt BETWEEN '20260101' AND '20260331'\nGROUP BY p.prdt_type_name\nORDER BY 成交额 DESC",
+      "generated_sql": "SELECT p.prdt_type_name AS 产品子类, SUM(COALESCE(t.buy_amt,0)+COALESCE(t.sell_amt,0)) AS 成交额\nFROM dwd_cust_tran_d t\nJOIN dim_product p ON t.prdt_id = p.prdt_id\nWHERE t.data_dt BETWEEN '20260101' AND '20260331'\nGROUP BY p.prdt_type_name\nORDER BY 成交额 DESC",
       "standard_sql": "select p.prdt_type_name, sum(coalesce(t.buy_amt,0)+coalesce(t.sell_amt,0)) as tran_amt from dwd_cust_tran_d t join dim_product p on t.prdt_id=p.prdt_id where t.data_dt between '20260101' and '20260331' group by p.prdt_type_name order by tran_amt desc",
       "field_contracts": [
         {
@@ -1422,7 +1441,7 @@
       ],
       "generated_result": {
         "columns": [
-          "产品二级分类",
+          "产品子类",
           "成交额"
         ],
         "row_count": 21,
@@ -1480,7 +1499,7 @@
         ],
         "normalised_result_hash": "9c43e757fd4521144a34331b323ee997afbb8a1d3bc4a2043477da9d4a91368c"
       },
-      "time_seconds": 2.4054930210113525
+      "time_seconds": 2.0264289379119873
     },
     {
       "id": 1018,
@@ -1547,7 +1566,7 @@
         ],
         "normalised_result_hash": "23b199acaa0340d2cf07497f3d23bc5e8bafa8c6c028759080e0958507e348d0"
       },
-      "time_seconds": 4.19374418258667
+      "time_seconds": 2.657492160797119
     },
     {
       "id": 1019,
@@ -1663,7 +1682,7 @@
         ],
         "normalised_result_hash": "c2b4ed5b10cd9a178986b632c0c1752a4b3d8c78c75006a8c43436e3e9abab57"
       },
-      "time_seconds": 1.998772144317627
+      "time_seconds": 2.0011308193206787
     },
     {
       "id": 1020,
@@ -1797,7 +1816,7 @@
         ],
         "normalised_result_hash": "0a512c92b5d8dccc94501744d4aef07f930e3bccbb47059b1d62716001872943"
       },
-      "time_seconds": 2.5227625370025635
+      "time_seconds": 2.724155902862549
     },
     {
       "id": 1021,
@@ -1822,7 +1841,7 @@
           "passed": true
         }
       },
-      "generated_sql": "WITH target_cust AS (\n  SELECT c.pty_id\n  FROM ads_cust_info_d c\n  WHERE c.data_dt = '20260531'\n    AND c.cust_age > 40\n    AND c.gender_cd = '5000002'\n    AND c.cust_lvl_cd = '1000001'\n    AND EXISTS (\n      SELECT 1\n      FROM dwd_cust_hold_d h\n      JOIN dim_product p ON h.prdt_id = p.prdt_id\n      WHERE h.pty_id = c.pty_id\n        AND h.data_dt = '20260331'\n        AND p.prdt_name = '比亚迪'\n        AND p.prdt_type_name = 'A股'\n      GROUP BY h.pty_id\n      HAVING SUM(COALESCE(h.mkt_val, 0)) > 1000\n    )\n),\nbegin_aset AS (\n  SELECT pty_id, SUM(COALESCE(nm_tot_aset, 0) + COALESCE(fc_pur_aset, 0)) AS begin_aset\n  FROM dws_cust_aset_d\n  WHERE data_dt = '20260101'\n  GROUP BY pty_id\n),\nend_aset AS (\n  SELECT pty_id, SUM(COALESCE(nm_tot_aset, 0) + COALESCE(fc_pur_aset, 0)) AS end_aset\n  FROM dws_cust_aset_d\n  WHERE data_dt = '20260331'\n  GROUP BY pty_id\n),\nflow AS (\n  SELECT pty_id,\n         SUM(COALESCE(cash_in, 0) + COALESCE(tran_in, 0) + COALESCE(assign_in, 0)) AS cash_inflow,\n         SUM(COALESCE(cash_out, 0) + COALESCE(tran_out, 0) + COALESCE(assign_out, 0)) AS cash_outflow\n  FROM dws_cust_fin_d\n  WHERE data_dt BETWEEN '20260101' AND '20260331'\n  GROUP BY pty_id\n)\nSELECT t.pty_id,\n       COALESCE(b.begin_aset, 0) AS begin_aset,\n       COALESCE(e.end_aset, 0) AS end_aset,\n       COALESCE(f.cash_inflow, 0) AS cash_inflow,\n       COALESCE(f.cash_outflow, 0) AS cash_outflow,\n       COALESCE(e.end_aset, 0) - COALESCE(b.begin_aset, 0) + COALESCE(f.cash_outflow, 0) - COALESCE(f.cash_inflow, 0) AS profit_loss\nFROM target_cust t\nLEFT JOIN begin_aset b ON t.pty_id = b.pty_id\nLEFT JOIN end_aset e ON t.pty_id = e.pty_id\nLEFT JOIN flow f ON t.pty_id = f.pty_id",
+      "generated_sql": "WITH target_cust AS (\n  SELECT c.pty_id\n  FROM ads_cust_info_d c\n  WHERE c.data_dt='20260531'\n    AND c.cust_age > 40\n    AND c.cust_lvl_cd='1000001'\n    AND c.gender_cd='5000002'\n    AND EXISTS (\n      SELECT 1\n      FROM dwd_cust_hold_d h\n      JOIN dim_product p ON h.prdt_id=p.prdt_id\n      WHERE h.pty_id=c.pty_id\n        AND h.data_dt='20260331'\n        AND p.prdt_name='比亚迪'\n        AND p.prdt_type_name='A股'\n      GROUP BY h.pty_id\n      HAVING SUM(COALESCE(h.mkt_val,0)) > 1000\n    )\n),\nbegin_aset AS (\n  SELECT pty_id, SUM(COALESCE(nm_tot_aset,0)+COALESCE(fc_pur_aset,0)) AS begin_aset\n  FROM dws_cust_aset_d\n  WHERE data_dt='20260101'\n  GROUP BY pty_id\n),\nend_aset AS (\n  SELECT pty_id, SUM(COALESCE(nm_tot_aset,0)+COALESCE(fc_pur_aset,0)) AS end_aset\n  FROM dws_cust_aset_d\n  WHERE data_dt='20260331'\n  GROUP BY pty_id\n),\nflow AS (\n  SELECT pty_id,\n         SUM(COALESCE(cash_in,0)+COALESCE(tran_in,0)+COALESCE(assign_in,0)) AS inflow,\n         SUM(COALESCE(cash_out,0)+COALESCE(tran_out,0)+COALESCE(assign_out,0)) AS outflow\n  FROM dws_cust_fin_d\n  WHERE data_dt BETWEEN '20260101' AND '20260331'\n  GROUP BY pty_id\n)\nSELECT t.pty_id,\n       COALESCE(b.begin_aset,0) AS begin_aset,\n       COALESCE(e.end_aset,0) AS end_aset,\n       COALESCE(f.inflow,0) AS inflow,\n       COALESCE(f.outflow,0) AS outflow,\n       COALESCE(e.end_aset,0)-COALESCE(b.begin_aset,0)+COALESCE(f.outflow,0)-COALESCE(f.inflow,0) AS profit_loss\nFROM target_cust t\nLEFT JOIN begin_aset b ON t.pty_id=b.pty_id\nLEFT JOIN end_aset e ON t.pty_id=e.pty_id\nLEFT JOIN flow f ON t.pty_id=f.pty_id",
       "standard_sql": "with custinfo as\n(select pty_id\nfrom ads_cust_info_d a\nleft join dim_public b on a.cust_lvl_cd=b.code and b.code_type_id='100'\nleft join dim_public c on a.gender_cd=c.code and c.code_type_id='500'\nwhere a.data_dt='20260531' and b.describe='紫金理财钻石卡客户' and c.describe='男'\nand a.cust_age>40\n), prdtinfo as\n(select a.pty_id,sum(a.mkt_val) as mkt_val\nfrom dwd_cust_hold_d a\ninner join dim_product b on a.prdt_id=b.prdt_id\nwhere b.prdt_name='比亚迪' and a.data_dt='20260331'\nand exists(select 1 from custinfo z where a.pty_id=z.pty_id)\ngroup by a.pty_id\nhaving sum(a.mkt_val)>1000\n)\nselect a.pty_id\n     ,coalesce(c.nm_tot_aset,0)+coalesce(c.fc_pur_aset,0) as bgn_aset\n     ,coalesce(b.nm_tot_aset,0)+coalesce(b.fc_pur_aset,0) as end_aset\n     ,coalesce(d.aset_in,0) as aset_in\n     ,coalesce(d.aset_out,0) as aset_out\n     ,coalesce(b.nm_tot_aset,0)+coalesce(b.fc_pur_aset,0)-coalesce(c.nm_tot_aset,0)-coalesce(c.fc_pur_aset,0)+coalesce(d.aset_out,0)-coalesce(d.aset_in,0) as aset_pft\nfrom prdtinfo a\nleft join dws_cust_aset_d b on a.pty_id=b.pty_id and b.data_dt='20260331'\nleft join dws_cust_aset_d c on a.pty_id=c.pty_id and c.data_dt='20260101'\nleft join\n(\nselect pty_id\n      ,sum(cash_in)+sum(tran_in)+sum(assign_in) as aset_in\n      ,sum(cash_out)+sum(tran_out)+sum(assign_out) as aset_out\nfrom dws_cust_fin_d\nwhere data_dt between '20260101' and '20260331'\ngroup by pty_id\n) d on a.pty_id=d.pty_id",
       "field_contracts": [
         {
@@ -1893,8 +1912,8 @@
           "pty_id",
           "begin_aset",
           "end_aset",
-          "cash_inflow",
-          "cash_outflow",
+          "inflow",
+          "outflow",
           "profit_loss"
         ],
         "row_count": 1,
@@ -1932,7 +1951,7 @@
         ],
         "normalised_result_hash": "aceec1e23d2d19197d4df18038d45e1e5e06846c6601e144e886cdd117256e63"
       },
-      "time_seconds": 5.964685440063477
+      "time_seconds": 6.148885726928711
     },
     {
       "id": 1022,
@@ -1994,7 +2013,7 @@
         ],
         "normalised_result_hash": "3ca45d4cbc545fc0fcb84d097993add4251738693118b08e039e6044e762d4b8"
       },
-      "time_seconds": 3.761964797973633
+      "time_seconds": 4.2216267585754395
     },
     {
       "id": 1023,
@@ -2019,7 +2038,7 @@
           "passed": true
         }
       },
-      "generated_sql": "WITH cust_tran AS (\n  SELECT t.pty_id, SUM(COALESCE(t.buy_amt,0) + COALESCE(t.sell_amt,0)) AS tran_amt\n  FROM dwd_cust_tran_d t\n  JOIN dim_product p ON t.prdt_id = p.prdt_id\n  WHERE t.data_dt BETWEEN '20260101' AND '20260331'\n    AND p.prdt_type_name = '创业板'\n  GROUP BY t.pty_id\n  HAVING SUM(COALESCE(t.buy_amt,0) + COALESCE(t.sell_amt,0)) > 200000\n)\nSELECT c.prov_name, COUNT(DISTINCT c.pty_id) AS cust_cnt\nFROM cust_tran ct\nJOIN ads_cust_info_d c ON ct.pty_id = c.pty_id AND c.data_dt = '20260531'\nGROUP BY c.prov_name",
+      "generated_sql": "WITH tran AS (\n  SELECT t.pty_id, SUM(COALESCE(t.buy_amt,0) + COALESCE(t.sell_amt,0)) AS total_amt\n  FROM dwd_cust_tran_d t\n  JOIN dim_product p ON t.prdt_id = p.prdt_id\n  WHERE t.data_dt BETWEEN '20260101' AND '20260331'\n    AND p.prdt_type_name = '创业板'\n  GROUP BY t.pty_id\n  HAVING SUM(COALESCE(t.buy_amt,0) + COALESCE(t.sell_amt,0)) > 200000\n)\nSELECT c.prov_name, COUNT(DISTINCT c.pty_id) AS cust_cnt\nFROM tran\nJOIN ads_cust_info_d c ON tran.pty_id = c.pty_id AND c.data_dt = '20260531'\nGROUP BY c.prov_name",
       "standard_sql": "select c.prov_name, count(distinct t.pty_id) as cust_cnt from ads_cust_info_d c join (select a.pty_id from dwd_cust_tran_d a join dim_product b on a.prdt_id=b.prdt_id where a.data_dt between '20260101' and '20260331' and b.prdt_type_name='创业板' group by a.pty_id having sum(coalesce(a.buy_amt,0)+coalesce(a.sell_amt,0))>200000) t on c.pty_id=t.pty_id where c.data_dt='20260531' group by c.prov_name order by cust_cnt desc",
       "field_contracts": [
         {
@@ -2105,7 +2124,7 @@
         ],
         "normalised_result_hash": "b91d592df440d954312490e68afb25dcd2b9b9260101c41eb35302eb91b56303"
       },
-      "time_seconds": 2.7799947261810303
+      "time_seconds": 2.3748888969421387
     },
     {
       "id": 1024,
@@ -2130,7 +2149,7 @@
           "passed": true
         }
       },
-      "generated_sql": "WITH kcb_cust AS (\n  SELECT t.pty_id\n  FROM dwd_cust_tran_d t\n  JOIN dim_product p ON t.prdt_id = p.prdt_id\n  WHERE t.data_dt BETWEEN '20260110' AND '20260215'\n    AND p.prdt_type_name = '科创板'\n  GROUP BY t.pty_id\n  HAVING SUM(COALESCE(t.buy_amt,0) + COALESCE(t.sell_amt,0)) > 250000\n)\nSELECT b.up_org_name, b.org_name, SUM(COALESCE(t.buy_amt,0) + COALESCE(t.sell_amt,0)) AS kcb_tran_amt\nFROM kcb_cust k\nJOIN dwd_cust_tran_d t ON t.pty_id = k.pty_id\nJOIN dim_product p ON t.prdt_id = p.prdt_id\nJOIN ads_cust_info_d c ON c.pty_id = k.pty_id AND c.data_dt = '20260531'\nJOIN dim_branch b ON c.org_id = b.org_id\nWHERE t.data_dt BETWEEN '20260110' AND '20260215'\n  AND p.prdt_type_name = '科创板'\nGROUP BY b.up_org_name, b.org_name",
+      "generated_sql": "WITH kcb_cust AS (\n  SELECT t.pty_id\n  FROM dwd_cust_tran_d t\n  INNER JOIN dim_product p ON t.prdt_id = p.prdt_id\n  WHERE t.data_dt BETWEEN '20260110' AND '20260215'\n    AND p.prdt_type_name = '科创板'\n  GROUP BY t.pty_id\n  HAVING SUM(COALESCE(t.buy_amt,0) + COALESCE(t.sell_amt,0)) > 250000\n)\nSELECT b.up_org_name, b.org_name, SUM(COALESCE(t.buy_amt,0) + COALESCE(t.sell_amt,0)) AS total_tran_amt\nFROM kcb_cust k\nINNER JOIN dwd_cust_tran_d t ON k.pty_id = t.pty_id\nINNER JOIN dim_product p ON t.prdt_id = p.prdt_id\nINNER JOIN ads_cust_info_d c ON t.pty_id = c.pty_id AND c.data_dt = '20260531'\nINNER JOIN dim_branch b ON c.org_id = b.org_id\nWHERE t.data_dt BETWEEN '20260110' AND '20260215'\n  AND p.prdt_type_name = '科创板'\nGROUP BY b.up_org_name, b.org_name",
       "standard_sql": "select c.up_org_name,c.org_name,sum(b.tran_amt) as tran_amt\nfrom ads_cust_info_d a\ninner join\n(\nselect a.pty_id,sum(buy_amt)+sum(sell_amt) as tran_amt\nfrom dwd_cust_tran_d a\ninner join dim_product b on a.prdt_id=b.prdt_id and b.prdt_type_name='科创板'\nwhere a.data_dt between '20260110' and '20260215'\ngroup by a.pty_id\nhaving sum(buy_amt)+sum(sell_amt)>250000\n) b on a.pty_id=b.pty_id\nleft join dim_branch c on a.org_id=c.org_id\ngroup by c.up_org_name,c.org_name",
       "field_contracts": [
         {
@@ -2171,7 +2190,7 @@
         "columns": [
           "up_org_name",
           "org_name",
-          "kcb_tran_amt"
+          "total_tran_amt"
         ],
         "row_count": 3,
         "sample_rows": [
@@ -2219,7 +2238,7 @@
         ],
         "normalised_result_hash": "3ac0a8ae02f39cf2aa246abc124c9f55991b64509177131d28230b9ec3ac6187"
       },
-      "time_seconds": 2.8583946228027344
+      "time_seconds": 2.4073541164398193
     },
     {
       "id": 1025,
@@ -2286,7 +2305,7 @@
         ],
         "normalised_result_hash": "d0bca111f8628137adc4c16f123496dcdd1d590d06cb5d9acd68b39fe656fb97"
       },
-      "time_seconds": 3.4010860919952393
+      "time_seconds": 4.215669393539429
     },
     {
       "id": 1026,
@@ -2311,7 +2330,7 @@
           "passed": true
         }
       },
-      "generated_sql": "SELECT b.up_org_name, b.org_name, AVG(COALESCE(a.nm_tot_aset,0)+COALESCE(a.fc_pur_aset,0)) AS avg_tot_aset\nFROM ads_cust_info_d c\nLEFT JOIN dws_cust_aset_d a ON c.pty_id=a.pty_id AND a.data_dt='20260331'\nJOIN dim_branch b ON c.org_id=b.org_id\nWHERE c.data_dt='20260531'\nGROUP BY b.up_org_name, b.org_name\nORDER BY avg_tot_aset DESC\nLIMIT 10",
+      "generated_sql": "SELECT b.up_org_name,\n       b.org_name,\n       AVG(COALESCE(a.nm_tot_aset, 0) + COALESCE(a.fc_pur_aset, 0)) AS avg_tot_aset\nFROM ads_cust_info_d c\nJOIN dim_branch b ON c.org_id = b.org_id\nLEFT JOIN dws_cust_aset_d a\n  ON c.pty_id = a.pty_id AND a.data_dt = '20260331'\nWHERE c.data_dt = '20260531'\nGROUP BY b.up_org_name, b.org_name\nORDER BY avg_tot_aset DESC\nLIMIT 10",
       "standard_sql": "select b.up_org_name, b.org_name, avg(coalesce(a.nm_tot_aset,0)+coalesce(a.fc_pur_aset,0)) as avg_tot_aset from ads_cust_info_d c left join dws_cust_aset_d a on c.pty_id = a.pty_id and a.data_dt='20260331' inner join dim_branch b on c.org_id = b.org_id where c.data_dt='20260531' group by b.up_org_name, b.org_name order by avg_tot_aset desc limit 10",
       "field_contracts": [
         {
@@ -2414,7 +2433,7 @@
         ],
         "normalised_result_hash": "99bac82dd977a294ebb1dc5ce666b6208a63c6aa93510e60c33f374a2da8c7ee"
       },
-      "time_seconds": 2.41400408744812
+      "time_seconds": 3.2330687046051025
     },
     {
       "id": 1027,
@@ -2521,7 +2540,7 @@
         ],
         "normalised_result_hash": "9ff1020255ec4cf7671c225f49debb4d012a8cb94c5b660a282ea677c2fcde0a"
       },
-      "time_seconds": 2.435497999191284
+      "time_seconds": 2.3123881816864014
     },
     {
       "id": 1028,
@@ -2546,7 +2565,7 @@
           "passed": true
         }
       },
-      "generated_sql": "WITH hold AS (\n  SELECT DISTINCT h.pty_id, p.up_prdt_type_name\n  FROM dwd_cust_hold_d h\n  INNER JOIN dim_product p ON h.prdt_id = p.prdt_id\n  WHERE h.data_dt = '20260331'\n)\nSELECT up_prdt_type_name,\n       COUNT(DISTINCT pty_id) * 1.0 / (SELECT COUNT(*) FROM ads_cust_info_d WHERE data_dt = '20260531') AS cust_coverage_rate\nFROM hold\nGROUP BY up_prdt_type_name\nORDER BY cust_coverage_rate DESC",
+      "generated_sql": "SELECT p.up_prdt_type_name AS 产品一级分类, COUNT(DISTINCT h.pty_id)*1.0/(SELECT COUNT(*) FROM ads_cust_info_d WHERE data_dt='20260531') AS 客户覆盖率 FROM dwd_cust_hold_d h INNER JOIN dim_product p ON h.prdt_id=p.prdt_id WHERE h.data_dt='20260331' GROUP BY p.up_prdt_type_name ORDER BY 客户覆盖率 DESC",
       "standard_sql": "select p.up_prdt_type_name, count(distinct h.pty_id)*1.0/(select count(*) from ads_cust_info_d where data_dt='20260531') as penetration from dwd_cust_hold_d h join dim_product p on h.prdt_id=p.prdt_id where h.data_dt='20260331' group by p.up_prdt_type_name order by penetration desc",
       "field_contracts": [
         {
@@ -2575,8 +2594,8 @@
       ],
       "generated_result": {
         "columns": [
-          "up_prdt_type_name",
-          "cust_coverage_rate"
+          "产品一级分类",
+          "客户覆盖率"
         ],
         "row_count": 6,
         "sample_rows": [
@@ -2633,7 +2652,7 @@
         ],
         "normalised_result_hash": "7759df3c20d442b2a17cdb9bde63a3661557505d8ad0ae488b466320abdb9feb"
       },
-      "time_seconds": 3.7753710746765137
+      "time_seconds": 2.987072467803955
     },
     {
       "id": 1029,
@@ -2694,7 +2713,7 @@
         ],
         "normalised_result_hash": "87c6a18e0a799ef7868853ee3b943d0a7da88024fe462955d01c7d43028af52e"
       },
-      "time_seconds": 2.7528796195983887
+      "time_seconds": 1.9510583877563477
     },
     {
       "id": 1030,
@@ -2761,7 +2780,7 @@
         ],
         "normalised_result_hash": "5c441ccce965fb3da22f42aa850da25c6c9c85fe3ff43a24aeed2cacfda4926b"
       },
-      "time_seconds": 2.7063567638397217
+      "time_seconds": 2.543461322784424
     }
   ]
 }
